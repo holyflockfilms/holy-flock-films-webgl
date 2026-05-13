@@ -1,0 +1,58 @@
+HOLY FLOCK FILMS — ALL FILMS IMAGE REPORT
+======================================================
+
+Public root: /images/films
+Film count: 3
+
+FILM: Do Not Feed The Animals (DNFTA)
+Slug: donotfeedtheanimals
+Images: 12
+------------------------------------------------------
+  POSTER | poster | 848x1200 thumb | 1555x2200 large
+  STILL 01 | panorama | 1300x545 thumb | 2400x1005 large
+  STILL 02 | panorama | 1300x545 thumb | 2400x1005 large
+  STILL 03 | panorama | 1300x545 thumb | 2400x1005 large
+  STILL 04 | panorama | 1300x545 thumb | 2400x1005 large
+  STILL 05 | panorama | 1300x545 thumb | 2400x1005 large
+  STILL 06 | panorama | 1300x545 thumb | 2400x1005 large
+  STILL 07 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 08 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 09 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 10 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 11 | wide | 1100x619 thumb | 1920x1080 large
+
+FILM: Invitation To An Execution (ITAE)
+Slug: invitationtoanexecution
+Images: 14
+------------------------------------------------------
+  POSTER | poster | 849x1200 thumb | 1556x2200 large
+  STILL 01 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 02 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 03 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 04 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 05 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 06 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 07 | wide | 1100x619 thumb | 1920x1080 large
+  STILL 08 | wide | 960x720 thumb | 1707x1280 large
+  STILL 09 | portrait | 825x1100 thumb | 1500x2000 large
+  STILL 10 | wide | 960x720 thumb | 1707x1280 large
+  STILL 11 | wide | 960x720 thumb | 1707x1280 large
+  STILL 12 | wide | 960x720 thumb | 1707x1280 large
+  STILL 13 | wide | 960x720 thumb | 1707x1280 large
+
+FILM: Love Me Hold Me Always (LMHMA)
+Slug: lovemeholdmealways
+Images: 12
+------------------------------------------------------
+  POSTER | poster | 900x1200 thumb | 1600x2133 large
+  STILL 01 | wide | 960x720 thumb | 1707x1280 large
+  STILL 02 | wide | 960x720 thumb | 1707x1280 large
+  STILL 03 | wide | 960x720 thumb | 1707x1280 large
+  STILL 04 | portrait | 825x1100 thumb | 1500x2000 large
+  STILL 05 | wide | 960x720 thumb | 1707x1280 large
+  STILL 06 | wide | 975x720 thumb | 1734x1280 large
+  STILL 07 | wide | 975x720 thumb | 1734x1280 large
+  STILL 08 | wide | 975x720 thumb | 1734x1280 large
+  STILL 09 | wide | 975x720 thumb | 1734x1280 large
+  STILL 10 | wide | 975x720 thumb | 1734x1280 large
+  STILL 11 | wide | 976x720 thumb | 1464x1080 large

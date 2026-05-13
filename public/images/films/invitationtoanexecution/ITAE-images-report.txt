@@ -1,0 +1,90 @@
+Invitation To An Execution — IMAGE PROCESSING REPORT
+======================================================
+Slug: invitationtoanexecution
+Prefix: ITAE
+Source folder: D:\Holy Flock\InvitationToAnExecution
+Images: 14
+
+POSTER / poster / poster
+  Source:   D:\Holy Flock\InvitationToAnExecution\Invitation to an Execution Poster V6D.jpg
+  Original: 3508x4961 / aspect 0.7071
+  Thumb:    /images/films/invitationtoanexecution/ITAE-poster-thumb.webp / 849x1200
+  Large:    /images/films/invitationtoanexecution/ITAE-poster-large.webp / 1556x2200
+
+STILL 01 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\Fos 001 - Lenny Leaning Against Tree.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-01-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-01-large.webp / 1920x1080
+
+STILL 02 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\Fos 002 - Nina with Bag on her Head.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-02-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-02-large.webp / 1920x1080
+
+STILL 03 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\Fos 003 - Vincent in Bunker.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-03-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-03-large.webp / 1920x1080
+
+STILL 04 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\FoS 005 - Lenny Counts to Three.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-04-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-04-large.webp / 1920x1080
+
+STILL 05 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\FoS 006 - Vincent with Gun.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-05-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-05-large.webp / 1920x1080
+
+STILL 06 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\FoS 007 - Lenny Carrying Nina.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-06-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-06-large.webp / 1920x1080
+
+STILL 07 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\FoS 008 - Lenny with Gun.jpg
+  Original: 3840x2160 / aspect 1.7778
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-07-thumb.webp / 1100x619
+  Large:    /images/films/invitationtoanexecution/ITAE-still-07-large.webp / 1920x1080
+
+STILL 08 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\IMG20230418182753.jpg
+  Original: 4096x3072 / aspect 1.3333
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-08-thumb.webp / 960x720
+  Large:    /images/films/invitationtoanexecution/ITAE-still-08-large.webp / 1707x1280
+
+STILL 09 / still / portrait
+  Source:   D:\Holy Flock\InvitationToAnExecution\IMG20230419130700.jpg
+  Original: 3072x4096 / aspect 0.75
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-09-thumb.webp / 825x1100
+  Large:    /images/films/invitationtoanexecution/ITAE-still-09-large.webp / 1500x2000
+
+STILL 10 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\IMG20230419152059.jpg
+  Original: 4096x3072 / aspect 1.3333
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-10-thumb.webp / 960x720
+  Large:    /images/films/invitationtoanexecution/ITAE-still-10-large.webp / 1707x1280
+
+STILL 11 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\IMG20230419154714.jpg
+  Original: 4000x3000 / aspect 1.3333
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-11-thumb.webp / 960x720
+  Large:    /images/films/invitationtoanexecution/ITAE-still-11-large.webp / 1707x1280
+
+STILL 12 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\IMG20230420140327.jpg
+  Original: 4096x3072 / aspect 1.3333
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-12-thumb.webp / 960x720
+  Large:    /images/films/invitationtoanexecution/ITAE-still-12-large.webp / 1707x1280
+
+STILL 13 / still / wide
+  Source:   D:\Holy Flock\InvitationToAnExecution\IMG20230420211012.jpg
+  Original: 4096x3072 / aspect 1.3333
+  Thumb:    /images/films/invitationtoanexecution/ITAE-still-13-thumb.webp / 960x720
+  Large:    /images/films/invitationtoanexecution/ITAE-still-13-large.webp / 1707x1280

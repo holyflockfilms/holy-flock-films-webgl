@@ -1,0 +1,2134 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { AnimatePresence, motion } from "framer-motion";
+
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+const BASE_WORLD = { width: 2800, height: 1800 };
+const REF_WIDTH = 1440;
+const CARD_RADIUS = 500;
+const CLICK_SUPPRESS_DISTANCE = 5;
+const CLUSTER_SPREAD_STRENGTH = 0.62;
+const INTRO_ZOOM_START = 0.18;
+const INTRO_ZOOM_END = 1;
+const MIN_ZOOM = 0.18;
+const MAX_ZOOM = 1.35;
+
+const BASE_FILMS = [
+  {
+    "title": "Love Me, Hold Me, Always",
+    "year": "2025",
+    "runtime": "14 min",
+    "format": "Short Film",
+    "director": "Hardey Speight",
+    "position": [
+      -720,
+      360
+    ],
+    "tone": "#91775f",
+    "synopsis": "A young woman returns from prison and searches for the fragments of a family that may no longer exist in the form she remembers.",
+    "vimeo": "https://player.vimeo.com/video/1105811175?h=dc1d1bdcff&badge=0&autopause=0&player_id=0&app_id=58479",
+    "vimeoAspect": "100 / 73.83",
+    "vimeoTitle": "Love Me, Hold Me, Always | TRAILER",
+    "images": [
+      {
+        "label": "POSTER",
+        "role": "poster",
+        "type": "poster",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\LMHMA _GRASS POSTER_ CREDITS 001 [3000x4000].jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-poster-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-poster-large.webp",
+        "width": 3000,
+        "height": 4000,
+        "aspect": 0.75,
+        "thumb_width": 900,
+        "thumb_height": 1200,
+        "large_width": 1600,
+        "large_height": 2133
+      },
+      {
+        "label": "STILL 01",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\IMG20240416151130.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-01-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-01-large.webp",
+        "width": 4096,
+        "height": 3072,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 02",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\IMG20240417140254.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-02-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-02-large.webp",
+        "width": 4000,
+        "height": 3000,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 03",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\IMG20240417194816.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-03-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-03-large.webp",
+        "width": 4096,
+        "height": 3072,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 04",
+        "role": "still",
+        "type": "portrait",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\IMG_1169.jpeg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-04-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-04-large.webp",
+        "width": 4284,
+        "height": 5712,
+        "aspect": 0.75,
+        "thumb_width": 825,
+        "thumb_height": 1100,
+        "large_width": 1500,
+        "large_height": 2000
+      },
+      {
+        "label": "STILL 05",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\IMG_1353.jpeg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-05-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-05-large.webp",
+        "width": 5712,
+        "height": 4284,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 06",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\LMHMA Still 01 - Building.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-06-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-06-large.webp",
+        "width": 4096,
+        "height": 3024,
+        "aspect": 1.3545,
+        "thumb_width": 975,
+        "thumb_height": 720,
+        "large_width": 1734,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 07",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\LMHMA Still 02 - Chrissie Bokeh Lights.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-07-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-07-large.webp",
+        "width": 4096,
+        "height": 3024,
+        "aspect": 1.3545,
+        "thumb_width": 975,
+        "thumb_height": 720,
+        "large_width": 1734,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 08",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\LMHMA Still 03 - Bars.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-08-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-08-large.webp",
+        "width": 4096,
+        "height": 3024,
+        "aspect": 1.3545,
+        "thumb_width": 975,
+        "thumb_height": 720,
+        "large_width": 1734,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 09",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\LMHMA Still 04 - Chrissie Untrusting.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-09-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-09-large.webp",
+        "width": 4096,
+        "height": 3024,
+        "aspect": 1.3545,
+        "thumb_width": 975,
+        "thumb_height": 720,
+        "large_width": 1734,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 10",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\Love Me Hold Me Always Still 05 - Chrissie & Prison Guard.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-10-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-10-large.webp",
+        "width": 4096,
+        "height": 3024,
+        "aspect": 1.3545,
+        "thumb_width": 975,
+        "thumb_height": 720,
+        "large_width": 1734,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 11",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\Love Me Hold Me Always Still 06.jpg",
+        "thumb": "/images/films/lovemeholdmealways/LMHMA-still-11-thumb.webp",
+        "large": "/images/films/lovemeholdmealways/LMHMA-still-11-large.webp",
+        "width": 1464,
+        "height": 1080,
+        "aspect": 1.3556,
+        "thumb_width": 976,
+        "thumb_height": 720,
+        "large_width": 1464,
+        "large_height": 1080
+      }
+    ]
+  },
+  {
+    "title": "Do Not Feed The Animals",
+    "year": "2021",
+    "runtime": "Trailer",
+    "format": "Short Film",
+    "director": "Holy Flock Films",
+    "position": [
+      160,
+      455
+    ],
+    "tone": "#615f52",
+    "synopsis": "A strange, darkly comic short-world built around appetite, captivity and the unnerving things people do when nobody is watching.",
+    "vimeo": "https://player.vimeo.com/video/508490906?badge=0&autopause=0&player_id=0&app_id=58479",
+    "vimeoAspect": "16 / 9",
+    "vimeoTitle": "'Do Not Feed The Animals' Trailer",
+    "images": [
+      {
+        "label": "POSTER",
+        "role": "poster",
+        "type": "poster",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DoNotFeedTheAnimalsPoster.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-poster-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-poster-large.webp",
+        "width": 2480,
+        "height": 3508,
+        "aspect": 0.707,
+        "thumb_width": 848,
+        "thumb_height": 1200,
+        "large_width": 1555,
+        "large_height": 2200
+      },
+      {
+        "label": "STILL 01",
+        "role": "still",
+        "type": "panorama",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DNFTA Graded Picture REC709 Stereo 21 01 21.mov.10_00_08_21.Still004-topaz-sharpen-face-upscale-2.6x.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-01-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-01-large.webp",
+        "width": 5345,
+        "height": 2239,
+        "aspect": 2.3872,
+        "thumb_width": 1300,
+        "thumb_height": 545,
+        "large_width": 2400,
+        "large_height": 1005
+      },
+      {
+        "label": "STILL 02",
+        "role": "still",
+        "type": "panorama",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DNFTA Graded Picture REC709 Stereo 21 01 21.mov.10_02_34_23.Still008-topaz-sharpen-upscale-2.6x.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-02-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-02-large.webp",
+        "width": 5345,
+        "height": 2239,
+        "aspect": 2.3872,
+        "thumb_width": 1300,
+        "thumb_height": 545,
+        "large_width": 2400,
+        "large_height": 1005
+      },
+      {
+        "label": "STILL 03",
+        "role": "still",
+        "type": "panorama",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DNFTA Graded Picture REC709 Stereo 21 01 21.mov.10_06_13_03.Still007-topaz-upscale-2.6x.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-03-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-03-large.webp",
+        "width": 5345,
+        "height": 2239,
+        "aspect": 2.3872,
+        "thumb_width": 1300,
+        "thumb_height": 545,
+        "large_width": 2400,
+        "large_height": 1005
+      },
+      {
+        "label": "STILL 04",
+        "role": "still",
+        "type": "panorama",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DNFTA Graded Picture REC709 Stereo 21 01 21.mov.10_13_21_17.Still002-topaz-sharpen-upscale-2.6x.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-04-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-04-large.webp",
+        "width": 5345,
+        "height": 2239,
+        "aspect": 2.3872,
+        "thumb_width": 1300,
+        "thumb_height": 545,
+        "large_width": 2400,
+        "large_height": 1005
+      },
+      {
+        "label": "STILL 05",
+        "role": "still",
+        "type": "panorama",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DNFTA Graded Picture REC709 Stereo 21 01 21.mov.10_13_22_20.Still005-topaz-upscale-2.6x.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-05-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-05-large.webp",
+        "width": 5345,
+        "height": 2239,
+        "aspect": 2.3872,
+        "thumb_width": 1300,
+        "thumb_height": 545,
+        "large_width": 2400,
+        "large_height": 1005
+      },
+      {
+        "label": "STILL 06",
+        "role": "still",
+        "type": "panorama",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DNFTA Graded Picture REC709 Stereo 21 01 21.mov.10_14_15_06.Still001-topaz-upscale-2.6x.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-06-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-06-large.webp",
+        "width": 5345,
+        "height": 2239,
+        "aspect": 2.3872,
+        "thumb_width": 1300,
+        "thumb_height": 545,
+        "large_width": 2400,
+        "large_height": 1005
+      },
+      {
+        "label": "STILL 07",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DoNotFeedTheAnimalsBTS01.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-07-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-07-large.webp",
+        "width": 1920,
+        "height": 1080,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 08",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DoNotFeedTheAnimalsBTS02.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-08-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-08-large.webp",
+        "width": 1920,
+        "height": 1080,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 09",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DoNotFeedTheAnimalsBTS03.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-09-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-09-large.webp",
+        "width": 1920,
+        "height": 1080,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 10",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DoNotFeedTheAnimalsBTS04.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-10-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-10-large.webp",
+        "width": 1920,
+        "height": 1080,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 11",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\DoNotFeedTheAnimals\\DoNotFeedTheAnimalsBTS05.jpg",
+        "thumb": "/images/films/donotfeedtheanimals/DNFTA-still-11-thumb.webp",
+        "large": "/images/films/donotfeedtheanimals/DNFTA-still-11-large.webp",
+        "width": 1920,
+        "height": 1080,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      }
+    ]
+  },
+  {
+    "title": "Invitation To An Execution",
+    "year": "2024",
+    "runtime": "Trailer",
+    "format": "Short Film",
+    "director": "Holy Flock Films",
+    "position": [
+      850,
+      210
+    ],
+    "tone": "#5f6c70",
+    "synopsis": "A tense, atmospheric short about performance, violence, silence and the emotional pressure that gathers when something unsaid becomes impossible to contain.",
+    "vimeo": "https://player.vimeo.com/video/912247753?h=d282e7a789&badge=0&autopause=0&player_id=0&app_id=58479",
+    "vimeoAspect": "16 / 9",
+    "vimeoTitle": "The Fury of Silence - Official Trailer",
+    "images": [
+      {
+        "label": "POSTER",
+        "role": "poster",
+        "type": "poster",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\Invitation to an Execution Poster V6D.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-poster-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-poster-large.webp",
+        "width": 3508,
+        "height": 4961,
+        "aspect": 0.7071,
+        "thumb_width": 849,
+        "thumb_height": 1200,
+        "large_width": 1556,
+        "large_height": 2200
+      },
+      {
+        "label": "STILL 01",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\Fos 001 - Lenny Leaning Against Tree.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-01-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-01-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 02",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\Fos 002 - Nina with Bag on her Head.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-02-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-02-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 03",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\Fos 003 - Vincent in Bunker.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-03-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-03-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 04",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\FoS 005 - Lenny Counts to Three.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-04-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-04-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 05",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\FoS 006 - Vincent with Gun.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-05-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-05-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 06",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\FoS 007 - Lenny Carrying Nina.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-06-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-06-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 07",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\FoS 008 - Lenny with Gun.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-07-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-07-large.webp",
+        "width": 3840,
+        "height": 2160,
+        "aspect": 1.7778,
+        "thumb_width": 1100,
+        "thumb_height": 619,
+        "large_width": 1920,
+        "large_height": 1080
+      },
+      {
+        "label": "STILL 08",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\IMG20230418182753.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-08-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-08-large.webp",
+        "width": 4096,
+        "height": 3072,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 09",
+        "role": "still",
+        "type": "portrait",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\IMG20230419130700.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-09-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-09-large.webp",
+        "width": 3072,
+        "height": 4096,
+        "aspect": 0.75,
+        "thumb_width": 825,
+        "thumb_height": 1100,
+        "large_width": 1500,
+        "large_height": 2000
+      },
+      {
+        "label": "STILL 10",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\IMG20230419152059.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-10-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-10-large.webp",
+        "width": 4096,
+        "height": 3072,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 11",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\IMG20230419154714.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-11-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-11-large.webp",
+        "width": 4000,
+        "height": 3000,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 12",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\IMG20230420140327.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-12-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-12-large.webp",
+        "width": 4096,
+        "height": 3072,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      },
+      {
+        "label": "STILL 13",
+        "role": "still",
+        "type": "wide",
+        "source": "D:\\Holy Flock\\InvitationToAnExecution\\IMG20230420211012.jpg",
+        "thumb": "/images/films/invitationtoanexecution/ITAE-still-13-thumb.webp",
+        "large": "/images/films/invitationtoanexecution/ITAE-still-13-large.webp",
+        "width": 4096,
+        "height": 3072,
+        "aspect": 1.3333,
+        "thumb_width": 960,
+        "thumb_height": 720,
+        "large_width": 1707,
+        "large_height": 1280
+      }
+    ]
+  },
+  {
+    "title": "When The Lights Went Out",
+    "year": "In Development",
+    "runtime": "Feature",
+    "format": "Drama",
+    "director": "Holy Flock Films",
+    "position": [
+      -470,
+      -420
+    ],
+    "tone": "#3f4a50",
+    "synopsis": "A post-industrial Welsh story about fathers, sons, work, silence, masculinity and the long shadow left after the furnaces go cold.",
+    "vimeo": "",
+    "images": []
+  },
+  {
+    "title": "Holy Flock Archive",
+    "year": "Ongoing",
+    "runtime": "Fragments",
+    "format": "Process Wall",
+    "director": "Holy Flock Films",
+    "position": [
+      520,
+      -475
+    ],
+    "tone": "#7d694d",
+    "synopsis": "The living style sheet: sketches, tests, accidents, posters, treatments, reference ghosts and strange little proofs of tone.",
+    "vimeo": "",
+    "images": []
+  }
+];
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function smoothstep(edge0, edge1, x) {
+  const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function mulberry32(seed) {
+  return function rand() {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function makeCards(seed) {
+  const rand = mulberry32(1000 + seed * 97);
+
+  const layouts = [
+    [
+      { type: "poster", label: "POSTER", dx: 0, dy: 0, w: 240, h: 352, rot: -7, z: 8 },
+      { type: "wide", label: "STILL A", dx: -185, dy: -98, w: 330, h: 186, rot: 8, z: 4 },
+      { type: "square", label: "CLOSE", dx: 170, dy: -112, w: 210, h: 210, rot: -11, z: 5 },
+      { type: "wide", label: "STILL B", dx: -120, dy: 148, w: 310, h: 174, rot: -4, z: 6 },
+      { type: "polaroid", label: "POLAROID", dx: 200, dy: 130, w: 190, h: 240, rot: 13, z: 7 },
+      { type: "panorama", label: "FRAME", dx: 18, dy: -205, w: 390, h: 132, rot: 3, z: 3 },
+      { type: "portrait", label: "FACE", dx: -270, dy: 84, w: 170, h: 250, rot: -13, z: 2 },
+      { type: "wide", label: "CUT", dx: 290, dy: -8, w: 260, h: 146, rot: 6, z: 1 },
+    ],
+    [
+      { type: "poster", label: "POSTER", dx: -42, dy: 16, w: 240, h: 352, rot: 5, z: 8 },
+      { type: "panorama", label: "FRAME", dx: 156, dy: -176, w: 410, h: 132, rot: -6, z: 3 },
+      { type: "portrait", label: "FACE", dx: 235, dy: 34, w: 178, h: 268, rot: 12, z: 6 },
+      { type: "wide", label: "STILL A", dx: -238, dy: -128, w: 300, h: 170, rot: -10, z: 4 },
+      { type: "square", label: "CLOSE", dx: -255, dy: 112, w: 216, h: 216, rot: 8, z: 5 },
+      { type: "wide", label: "STILL B", dx: 72, dy: 184, w: 335, h: 188, rot: -3, z: 7 },
+      { type: "polaroid", label: "POLAROID", dx: 328, dy: 156, w: 176, h: 226, rot: -12, z: 2 },
+    ],
+    [
+      { type: "poster", label: "POSTER", dx: 38, dy: -18, w: 249, h: 362, rot: -11, z: 8 },
+      { type: "wide", label: "STILL A", dx: 252, dy: -122, w: 320, h: 180, rot: 7, z: 5 },
+      { type: "portrait", label: "FACE", dx: -202, dy: -82, w: 170, h: 255, rot: -5, z: 6 },
+      { type: "panorama", label: "FRAME", dx: -42, dy: 226, w: 430, h: 136, rot: 4, z: 3 },
+      { type: "square", label: "CLOSE", dx: 262, dy: 124, w: 208, h: 208, rot: 14, z: 7 },
+      { type: "wide", label: "STILL B", dx: -286, dy: 128, w: 286, h: 160, rot: -14, z: 2 },
+      { type: "polaroid", label: "POLAROID", dx: 6, dy: -236, w: 185, h: 235, rot: 9, z: 4 },
+      { type: "wide", label: "CUT", dx: 386, dy: -4, w: 246, h: 138, rot: -2, z: 1 },
+    ],
+    [
+      { type: "poster", label: "POSTER", dx: -8, dy: 28, w: 240, h: 352, rot: 2, z: 8 },
+      { type: "square", label: "CLOSE", dx: 166, dy: -188, w: 225, h: 225, rot: -12, z: 7 },
+      { type: "wide", label: "STILL A", dx: -220, dy: -178, w: 348, h: 196, rot: 11, z: 5 },
+      { type: "portrait", label: "FACE", dx: 270, dy: 40, w: 166, h: 260, rot: 6, z: 4 },
+      { type: "wide", label: "STILL B", dx: -214, dy: 84, w: 300, h: 169, rot: -8, z: 6 },
+      { type: "polaroid", label: "POLAROID", dx: 132, dy: 214, w: 194, h: 246, rot: -5, z: 3 },
+      { type: "panorama", label: "FRAME", dx: 360, dy: -118, w: 360, h: 122, rot: 10, z: 2 },
+    ],
+    [
+      { type: "poster", label: "POSTER", dx: 24, dy: -6, w: 242, h: 352, rot: 9, z: 8 },
+      { type: "wide", label: "STILL A", dx: -308, dy: -28, w: 322, h: 181, rot: -4, z: 7 },
+      { type: "portrait", label: "FACE", dx: -108, dy: -226, w: 176, h: 268, rot: 13, z: 3 },
+      { type: "square", label: "CLOSE", dx: 244, dy: -152, w: 214, h: 214, rot: -8, z: 6 },
+      { type: "wide", label: "STILL B", dx: 226, dy: 118, w: 318, h: 178, rot: 5, z: 5 },
+      { type: "polaroid", label: "POLAROID", dx: -212, dy: 160, w: 182, h: 232, rot: -13, z: 4 },
+      { type: "panorama", label: "FRAME", dx: 42, dy: 244, w: 398, h: 128, rot: -2, z: 2 },
+      { type: "wide", label: "CUT", dx: 390, dy: 26, w: 250, h: 140, rot: 13, z: 1 },
+    ],
+  ];
+
+  const base = layouts[(seed - 1) % layouts.length];
+
+  return base.map((card, i) => {
+    const dx = card.dx + (rand() - 0.5) * 52;
+    const dy = card.dy + (rand() - 0.5) * 52;
+    const len = Math.max(1, Math.hypot(dx, dy));
+    return {
+      ...card,
+      dx,
+      dy,
+      rot: card.rot + (rand() - 0.5) * 7,
+      spreadX: (dx / len) * (70 + rand() * 72) + (rand() - 0.5) * 28,
+      spreadY: (dy / len) * (70 + rand() * 72) + (rand() - 0.5) * 28,
+      seed: seed * 120 + i * 13,
+    };
+  });
+}
+
+function dimensionsForImage(type, role) {
+  if (role === "poster" || type === "poster") return { w: 270, h: 390 };
+  if (type === "panorama") return { w: 390, h: 164 };
+  if (type === "portrait") return { w: 180, h: 260 };
+  if (type === "square") return { w: 220, h: 220 };
+  return { w: 320, h: 180 };
+}
+
+function hydrateClusterCards(film, filmIndex) {
+  const layout = makeCards(filmIndex + 1);
+  const images = film.images || [];
+
+  if (!images.length) return layout;
+
+  return layout.map((card, cardIndex) => {
+    const image = images[cardIndex] || images[cardIndex % images.length];
+    const dims = dimensionsForImage(image.type, image.role);
+
+    return {
+      ...card,
+      type: image.role === "poster" ? "poster" : image.type,
+      label: image.label || card.label,
+      w: dims.w,
+      h: dims.h,
+      thumb: image.thumb,
+      large: image.large,
+      sourceWidth: image.width,
+      sourceHeight: image.height,
+      aspect: image.aspect,
+    };
+  });
+}
+
+function hydrateGalleryCards(film) {
+  const images = film.images || [];
+  if (!images.length) return [];
+
+  return images.map((image, imageIndex) => {
+    const dims = dimensionsForImage(image.type, image.role);
+    return {
+      type: image.role === "poster" ? "poster" : image.type,
+      label: image.label || `IMAGE ${imageIndex + 1}`,
+      thumb: image.thumb,
+      large: image.large,
+      w: dims.w,
+      h: dims.h,
+      dx: 0,
+      dy: 0,
+      rot: 0,
+      z: 40 - imageIndex,
+      sourceWidth: image.width,
+      sourceHeight: image.height,
+      aspect: image.aspect,
+    };
+  });
+}
+
+const FILMS = BASE_FILMS.map((film, i) => ({
+  ...film,
+  number: ROMAN[i],
+  cards: hydrateClusterCards(film, i),
+  galleryCards: hydrateGalleryCards(film),
+}));
+
+function useCardTexture(film, card, index) {
+  const fallback = useMemo(() => createFilmTexture({ film, card, index }), [film, card, index]);
+  const [loadedTexture, setLoadedTexture] = useState(null);
+
+  useEffect(() => {
+    if (!card.thumb) {
+      setLoadedTexture(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const loader = new THREE.TextureLoader();
+
+    loader.load(
+      card.thumb,
+      (texture) => {
+        if (cancelled) return;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = 8;
+        texture.needsUpdate = true;
+        setLoadedTexture(texture);
+      },
+      undefined,
+      () => {
+        if (!cancelled) setLoadedTexture(null);
+      }
+    );
+
+    return () => {
+      cancelled = true;
+    };
+  }, [card.thumb]);
+
+  return loadedTexture || fallback;
+}
+
+function useImageCardsForModal(film) {
+  return film.galleryCards && film.galleryCards.length ? film.galleryCards : film.cards;
+}
+
+function useWindowSize() {
+  const [size, setSize] = useState(() => ({
+    width: typeof window === "undefined" ? 1440 : window.innerWidth,
+    height: typeof window === "undefined" ? 900 : window.innerHeight,
+  }));
+
+  useEffect(() => {
+    const update = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return size;
+}
+
+function createFilmTexture({ film, card, index }) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1024;
+  canvas.height = 1024;
+  const ctx = canvas.getContext("2d");
+  const rand = mulberry32(2000 + card.seed);
+
+  ctx.fillStyle = "#f4f0e6";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const gradient = ctx.createLinearGradient(0, 0, 1024, 1024);
+  gradient.addColorStop(0, `${film.tone}33`);
+  gradient.addColorStop(0.45, "#f8f4ea");
+  gradient.addColorStop(1, `${film.tone}88`);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  ctx.save();
+  ctx.translate(96 + rand() * 90, 92 + rand() * 70);
+  ctx.rotate((rand() - 0.5) * 0.18);
+  ctx.fillStyle = `${film.tone}b8`;
+  ctx.fillRect(0, 0, 780, 610);
+
+  ctx.globalCompositeOperation = "screen";
+  ctx.fillStyle = "rgba(255,255,255,0.38)";
+  for (let i = 0; i < 15; i++) {
+    const x = rand() * 770;
+    const y = rand() * 590;
+    const r = 22 + rand() * 120;
+    if (i % 3 === 0) {
+      ctx.fillRect(x - r / 2, y - r / 2, r * 1.6, r * 0.52);
+    } else {
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillStyle = "rgba(0,0,0,0.16)";
+  for (let i = 0; i < 8; i++) {
+    ctx.fillRect(rand() * 780, rand() * 610, 20 + rand() * 120, 2 + rand() * 14);
+  }
+  ctx.globalCompositeOperation = "source-over";
+  ctx.strokeStyle = "rgba(26,23,20,0.72)";
+  ctx.lineWidth = 9;
+  ctx.strokeRect(0, 0, 780, 610);
+  ctx.restore();
+
+  ctx.strokeStyle = "rgba(26,23,20,0.22)";
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  for (let i = 0; i < 42; i++) {
+    ctx.beginPath();
+    const sx = rand() * 1024;
+    const sy = rand() * 1024;
+    ctx.moveTo(sx, sy);
+    ctx.bezierCurveTo(
+      sx + (rand() - 0.5) * 140,
+      sy + (rand() - 0.5) * 140,
+      sx + (rand() - 0.5) * 260,
+      sy + (rand() - 0.5) * 260,
+      sx + (rand() - 0.5) * 360,
+      sy + (rand() - 0.5) * 360,
+    );
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "rgba(26,23,20,0.92)";
+  ctx.font = "900 48px serif";
+  ctx.fillText(`${film.number} / ${card.label}`, 56, 84);
+
+  ctx.font = card.type === "poster" ? "900 98px serif" : "900 72px serif";
+  const title = film.title.toUpperCase();
+  const words = title.split(" ");
+  const lines = [];
+  let line = "";
+  words.forEach((word) => {
+    const test = `${line} ${word}`.trim();
+    if (test.length > 16 && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  });
+  lines.push(line);
+  lines.slice(0, 4).forEach((txt, i) => {
+    ctx.fillText(txt, 52, 760 + i * 78);
+  });
+
+  ctx.font = "italic 44px serif";
+  ctx.fillStyle = `${film.tone}`;
+  ctx.fillText(`${film.year} — ${film.format}`, 56, 962);
+
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = image.data;
+  for (let i = 0; i < data.length; i += 4 * 11) {
+    const n = rand() * 34 - 17;
+    data[i] = clamp(data[i] + n, 0, 255);
+    data[i + 1] = clamp(data[i + 1] + n, 0, 255);
+    data[i + 2] = clamp(data[i + 2] + n, 0, 255);
+  }
+  ctx.putImageData(image, 0, 0);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createDoodleTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 4096;
+  canvas.height = 2560;
+  const ctx = canvas.getContext("2d");
+  const rand = mulberry32(666);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const words = ["AGOR", "CUT", "HOLD", "RITUAL", "SAINT", "RUIN", "FLOCK", "LIGHT", "FIELD", "SIGNAL"];
+  ctx.strokeStyle = "rgba(26,23,20,0.22)";
+  ctx.fillStyle = "rgba(26,23,20,0.18)";
+  ctx.lineWidth = 4;
+  ctx.lineCap = "round";
+
+  for (let i = 0; i < 220; i++) {
+    const x = rand() * canvas.width;
+    const y = rand() * canvas.height;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((rand() - 0.5) * Math.PI * 2);
+    const kind = i % 9;
+    if (kind === 0) {
+      ctx.font = `${42 + rand() * 42}px Caveat, cursive`;
+      ctx.fillText(words[Math.floor(rand() * words.length)], 0, 0);
+    } else if (kind === 1) {
+      ctx.beginPath();
+      ctx.moveTo(0, -30);
+      for (let p = 0; p < 5; p++) {
+        ctx.lineTo(Math.cos((p * 2 * Math.PI) / 5 - Math.PI / 2) * 52, Math.sin((p * 2 * Math.PI) / 5 - Math.PI / 2) * 52);
+        ctx.lineTo(Math.cos(((p + 0.5) * 2 * Math.PI) / 5 - Math.PI / 2) * 22, Math.sin(((p + 0.5) * 2 * Math.PI) / 5 - Math.PI / 2) * 22);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    } else if (kind === 2) {
+      ctx.beginPath();
+      ctx.arc(0, 0, 22 + rand() * 85, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (kind === 3) {
+      ctx.beginPath();
+      ctx.moveTo(0, -70);
+      ctx.lineTo(62, 42);
+      ctx.lineTo(-62, 42);
+      ctx.closePath();
+      ctx.stroke();
+    } else if (kind === 4) {
+      ctx.beginPath();
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 3) {
+        const px = Math.cos(a) * 64;
+        const py = Math.sin(a) * 64;
+        if (a === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      for (let j = 0; j < 10; j++) {
+        ctx.lineTo((rand() - 0.5) * 300, (rand() - 0.5) * 300);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function WorldDoodles({ worldWidth, worldHeight }) {
+  const texture = useMemo(() => createDoodleTexture(), []);
+  const ref = useRef();
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    ref.current.material.opacity = 0.22 + Math.sin(clock.elapsedTime * 0.18) * 0.02;
+  });
+
+  return (
+    <mesh ref={ref} position={[0, 0, -80]}>
+      <planeGeometry args={[worldWidth, worldHeight]} />
+      <meshBasicMaterial map={texture} transparent opacity={0.24} depthWrite={false} />
+    </mesh>
+  );
+}
+
+function WorldBorder({ worldWidth, worldHeight }) {
+  return (
+    <group position={[0, 0, -78]}>
+      <mesh>
+        <planeGeometry args={[worldWidth, worldHeight]} />
+        <meshBasicMaterial color="#fafaf7" />
+      </mesh>
+      <mesh position={[0, 0, 1]}>
+        <planeGeometry args={[worldWidth - 80, worldHeight - 80]} />
+        <meshBasicMaterial color="#fafaf7" transparent opacity={0} />
+      </mesh>
+    </group>
+  );
+}
+
+function CardMesh({ film, card, index, scale, proximity, clusterActivation, cursorWorld, hoveredIndex, setHovered, openFilm, suppressClickRef, setCursorMode, setHoverType }) {
+  const ref = useRef();
+  const activationRef = useRef(0);
+  const siblingRef = useRef(0);
+  const texture = useCardTexture(film, card, index);
+  const temp = useMemo(() => new THREE.Vector3(), []);
+
+  useFrame(() => {
+    if (!ref.current) return;
+    const clusterX = film.position[0] * scale;
+    const clusterY = film.position[1] * scale;
+    const isHovered = hoveredIndex === index;
+    const isPoster = card.type === "poster";
+
+    // Radial fan-out behaviour:
+    // The cursor activates the cluster, but cards do not chase the cursor.
+    // Every card behind/around the poster moves outward based on its position
+    // relative to the main poster image. A 10 o'clock card fans further out
+    // at 10 o'clock, a 4 o'clock card fans further out at 4 o'clock, etc.
+    const posterCard = film.cards.find((candidate) => candidate.type === "poster") || { dx: 0, dy: 0 };
+    const relativeX = card.dx - posterCard.dx;
+    const relativeY = card.dy - posterCard.dy;
+    const relativeLength = Math.max(1, Math.hypot(relativeX, relativeY));
+    const radialX = isPoster ? 0 : relativeX / relativeLength;
+    const radialY = isPoster ? 0 : relativeY / relativeLength;
+
+    const hoverDistance = hoveredIndex === null ? 999 : Math.abs(index - hoveredIndex);
+    const siblingInfluenceTarget = hoveredIndex === null ? 0 : Math.max(0, 1 - hoverDistance * 0.24);
+    const delaySpeed = 0.055 + index * 0.009;
+
+    activationRef.current = THREE.MathUtils.lerp(
+      activationRef.current,
+      clusterActivation,
+      delaySpeed
+    );
+
+    siblingRef.current = THREE.MathUtils.lerp(
+      siblingRef.current,
+      siblingInfluenceTarget,
+      delaySpeed * 1.4
+    );
+
+    const active = activationRef.current;
+    const siblingInfluence = siblingRef.current;
+
+    // Main poster grows from its centre but does not move outward.
+    // Surrounding cards both scale and fan away from the poster.
+    const centreGrow = isPoster ? 0.13 : 0.075;
+    const clusterGrow = centreGrow + (card.z / 8) * 0.05;
+    const siblingScaleBoost = siblingInfluence * 0.08;
+    const hoverBoost = isHovered ? (isPoster ? 0.18 : 0.2) : 0;
+
+    const originalX = card.dx * scale;
+    const originalY = card.dy * scale;
+
+    const fanBase = isPoster ? 0 : 72 + Math.min(150, relativeLength * 0.24);
+    const fanPower = active * (0.72 + siblingInfluence * 0.24 + (isHovered ? 0.18 : 0));
+    const fanX = radialX * fanBase * fanPower * CLUSTER_SPREAD_STRENGTH * scale;
+    const fanY = radialY * fanBase * fanPower * CLUSTER_SPREAD_STRENGTH * scale;
+
+    const targetScale = 1 + active * clusterGrow + siblingScaleBoost + hoverBoost;
+    const targetRotation = THREE.MathUtils.degToRad(card.rot * (1 - active * 0.72));
+    const tx = originalX + fanX;
+    const ty = originalY + fanY;
+    const tz = card.z * 8;
+
+    temp.set(tx, ty, tz);
+    ref.current.position.lerp(temp, 0.14);
+    ref.current.scale.x = THREE.MathUtils.lerp(ref.current.scale.x, targetScale, 0.12);
+    ref.current.scale.y = THREE.MathUtils.lerp(ref.current.scale.y, targetScale, 0.12);
+    ref.current.rotation.z = THREE.MathUtils.lerp(ref.current.rotation.z, targetRotation, 0.13);
+  });
+
+  return (
+    <mesh
+      ref={ref}
+      renderOrder={100 + card.z}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setHovered(index);
+        setHoverType("cluster");
+        setCursorMode("view");
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        setHovered(null);
+        setHoverType(null);
+        setCursorMode("drag");
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!suppressClickRef.current) openFilm(film, index);
+      }}
+    >
+      <planeGeometry args={[card.w * scale, card.h * scale]} />
+      <meshBasicMaterial map={texture} transparent depthWrite={false} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function FilmCluster({ film, scale, cursorWorld, openFilm, suppressClickRef, setCursorMode, setHoverType }) {
+  const [hovered, setHovered] = useState(null);
+  const clusterX = film.position[0] * scale;
+  const clusterY = film.position[1] * scale;
+  const dist = Math.hypot(cursorWorld.x - clusterX, cursorWorld.y - clusterY);
+  const proximity = 1 - smoothstep(0, CARD_RADIUS * scale, dist);
+  const clusterActivation = Math.max(proximity, hovered !== null ? 1 : 0);
+  const hitRadius = 430 * scale;
+
+  return (
+    <group position={[clusterX, clusterY, 0]}>
+      <mesh
+        position={[0, 0, -5]}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHoverType("cluster");
+          setCursorMode("view");
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          setHoverType(null);
+          setCursorMode("drag");
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!suppressClickRef.current) openFilm(film, 0);
+        }}
+      >
+        <circleGeometry args={[hitRadius, 64]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+      </mesh>
+
+      {film.cards.map((card, index) => (
+        <CardMesh
+          key={`${film.title}-${index}`}
+          film={film}
+          card={card}
+          index={index}
+          scale={scale}
+          proximity={proximity}
+          clusterActivation={clusterActivation}
+          cursorWorld={cursorWorld}
+          hoveredIndex={hovered}
+          setHovered={setHovered}
+          openFilm={openFilm}
+          suppressClickRef={suppressClickRef}
+          setCursorMode={setCursorMode}
+          setHoverType={setHoverType}
+        />
+      ))}
+
+      <group position={[0, -312 * scale, 20]} renderOrder={220}>
+        <FilmLabel film={film} scale={scale} proximity={proximity} />
+      </group>
+    </group>
+  );
+}
+
+function makeLabelTexture(film) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 900;
+  canvas.height = 180;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, 900, 180);
+  ctx.fillStyle = "rgba(26,23,20,0.92)";
+  ctx.font = "900 54px serif";
+  ctx.fillText(`${film.number}. ${film.title.toUpperCase()}`, 0, 72);
+  ctx.font = "italic 34px serif";
+  ctx.fillStyle = "rgba(26,23,20,0.54)";
+  ctx.fillText(`${film.year} / ${film.runtime} / ${film.format}`, 0, 124);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function FilmLabel({ film, scale, proximity }) {
+  const ref = useRef();
+  const texture = useMemo(() => makeLabelTexture(film), [film]);
+  useFrame(() => {
+    if (!ref.current) return;
+    ref.current.material.opacity = THREE.MathUtils.lerp(ref.current.material.opacity, 0.15 + proximity * 0.85, 0.12);
+    ref.current.scale.setScalar(THREE.MathUtils.lerp(ref.current.scale.x, 0.85 + proximity * 0.18, 0.12));
+  });
+  return (
+    <mesh ref={ref} renderOrder={260}>
+      <planeGeometry args={[450 * scale, 90 * scale]} />
+      <meshBasicMaterial map={texture} transparent opacity={0.24} depthWrite={false} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function World({ pan, scale, cursorWorld, openFilm, suppressClickRef, setCursorMode, setHoverType }) {
+  const worldWidth = BASE_WORLD.width * scale;
+  const worldHeight = BASE_WORLD.height * scale;
+
+  return (
+    <group position={[pan.x, pan.y, 0]}>
+      <WorldBorder worldWidth={worldWidth} worldHeight={worldHeight} />
+      <WorldDoodles worldWidth={worldWidth} worldHeight={worldHeight} />
+      {FILMS.map((film) => (
+        <FilmCluster
+          key={film.title}
+          film={film}
+          scale={scale}
+          cursorWorld={cursorWorld}
+          openFilm={openFilm}
+          suppressClickRef={suppressClickRef}
+          setCursorMode={setCursorMode}
+          setHoverType={setHoverType}
+        />
+      ))}
+    </group>
+  );
+}
+
+function Scene({ pan, scale, cursorWorld, openFilm, suppressClickRef, setCursorMode, setHoverType }) {
+  return (
+    <Canvas
+      orthographic
+      camera={{ position: [0, 0, 1000], zoom: 1, near: 0.1, far: 2000 }}
+      dpr={[1, 1.75]}
+      gl={{ antialias: true, alpha: false }}
+    >
+      <color attach="background" args={["#fafaf7"]} />
+      <World
+        pan={pan}
+        scale={scale}
+        cursorWorld={cursorWorld}
+        openFilm={openFilm}
+        suppressClickRef={suppressClickRef}
+        setCursorMode={setCursorMode}
+        setHoverType={setHoverType}
+      />
+    </Canvas>
+  );
+}
+
+const CURSOR_COPY = {
+  default: "",
+  drag: "DRAG",
+  dragging: "...",
+  view: "VIEW",
+  play: "PLAY",
+  pause: "PAUSE",
+  write: "WRITE",
+};
+
+function CustomCursor({ mode }) {
+  const ref = useRef(null);
+  const label = CURSOR_COPY[mode] || "";
+
+  useEffect(() => {
+    const move = (e) => {
+      if (!ref.current) return;
+      ref.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+    };
+    window.addEventListener("pointermove", move);
+    return () => window.removeEventListener("pointermove", move);
+  }, []);
+
+  return (
+    <div ref={ref} className={`customCursor ${mode}`}>
+      <div className="cursorRing">
+        <span>{label}</span>
+      </div>
+      <div className="cursorDot" />
+    </div>
+  );
+}
+
+function FilmVisual({ film, card, large = false }) {
+  const rand = useMemo(() => mulberry32(7000 + card.seed), [card.seed]);
+  const background = useMemo(() => {
+    const a = film.tone;
+    const b = rand() > 0.5 ? "#f8f1e3" : "#d7c8a7";
+    return `linear-gradient(${Math.floor(rand() * 180)}deg, ${a}55, ${b}, ${a}aa)`;
+  }, [film.tone, rand]);
+
+  const imageUrl = large ? card.large || card.thumb : card.thumb || card.large;
+  const visualStyle = imageUrl
+    ? { backgroundImage: `url(${imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+    : { background };
+
+  return (
+    <div className={`filmVisual ${card.type} ${large ? "large" : ""}`} style={visualStyle}>
+      <div className="visualFrame" />
+      <div className="visualMarks" />
+      <div className="visualTitle">
+        <span>{film.number} / {card.label}</span>
+        <strong>{film.title}</strong>
+      </div>
+    </div>
+  );
+}
+
+function FilmModal({ selected, activeCard, setActiveCard, close, setCursorMode, setHoverType }) {
+  const film = selected?.film;
+  if (!film) return null;
+  const isTrailer = activeCard === "trailer";
+  const galleryCards = useImageCardsForModal(film);
+  const card = isTrailer ? film.cards[0] : galleryCards[activeCard] || film.cards[0];
+
+  return (
+    <motion.div
+      className="modalBackdrop"
+      data-ui="true"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={close}
+    >
+      <motion.div
+        className="filmModal"
+        initial={{ opacity: 0, scale: 0.96, y: 18 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 18 }}
+        transition={{ type: "spring", stiffness: 160, damping: 22 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="filmPageClose" onClick={close}>CLOSE ×</button>
+        <div className="thumbStrip" onClick={close} title="Click empty area to close">
+          <div className="thumbRail" onClick={(e) => e.stopPropagation()}>
+          <button
+            className={`thumb trailerThumb ${activeCard === "trailer" ? "active" : ""}`}
+            onClick={() => setActiveCard("trailer")}
+            onPointerEnter={() => {
+              setHoverType("cluster");
+              setCursorMode("view");
+            }}
+            onPointerLeave={() => {
+              setHoverType(null);
+              setCursorMode("drag");
+            }}
+          >
+            <FilmVisual film={film} card={film.cards[0]} />
+          </button>
+
+          {galleryCards.map((thumb, index) => (
+            <button
+              key={thumb.label}
+              className={`thumb ${activeCard === index ? "active" : ""}`}
+              onClick={() => setActiveCard(index)}
+              onPointerEnter={() => {
+                setHoverType("cluster");
+                setCursorMode("view");
+              }}
+              onPointerLeave={() => {
+                setHoverType(null);
+                setCursorMode("drag");
+              }}
+            >
+              <FilmVisual film={film} card={thumb} />
+            </button>
+          ))}
+          </div>
+        </div>
+
+        <div className="modalMain">
+          <div className="viewerArea">
+            {isTrailer && film.vimeo ? (
+              <div className="vimeoWrap" style={{ aspectRatio: film.vimeoAspect || "16 / 9" }}>
+                <iframe
+                  src={film.vimeo}
+                  title={film.vimeoTitle || `${film.title} trailer`}
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              <FilmVisual film={film} card={card} large />
+            )}
+            {isTrailer && !film.vimeo && (
+              <p className="vimeoNote">Trailer selected. Add a Vimeo player URL to this film's vimeo field to show the embedded trailer here.</p>
+            )}
+          </div>
+
+          <aside className="modalSide">
+            <div className="modalInfo" onClick={(e) => e.stopPropagation()}>
+            <p className="sectionMarker">OPVS {film.number}</p>
+            <h2>{film.title}</h2>
+            <dl>
+              <div><dt>Year</dt><dd>{film.year}</dd></div>
+              <div><dt>Runtime</dt><dd>{film.runtime}</dd></div>
+              <div><dt>Format</dt><dd>{film.format}</dd></div>
+              <div><dt>Director</dt><dd>{film.director}</dd></div>
+            </dl>
+            <p>{film.synopsis}</p>
+            <button onClick={close} className="closeButton">return to wall</button>
+            </div>
+          </aside>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function BottomNav({ visible, overlay, setOverlay, setCursorMode, setHoverType }) {
+  const open = (target) => {
+    if (target === "films") setOverlay(null);
+    else setOverlay(target);
+  };
+
+  return (
+    <nav
+      data-ui="true"
+      className={`bottomNav ${visible ? "visible" : ""}`}
+      onPointerEnter={() => setHoverType("nav")}
+      onPointerLeave={() => setHoverType(null)}
+    >
+      {[
+        ["manifesto", "MANIFESTO"],
+        ["films", "FILMS"],
+        ["scores", "SCORES"],
+        ["write", "WRITE"],
+      ].map(([key, label]) => (
+        <button
+          key={key}
+          className={overlay === key ? "active" : ""}
+          onClick={() => open(key)}
+          onPointerEnter={() => setCursorMode(key === "write" ? "write" : "view")}
+          onPointerLeave={() => setCursorMode("drag")}
+        >
+          {label}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function ManifestoOverlay({ close }) {
+  return (
+    <OverlayShell close={close} marker="I / MANIFESTO" title="The Devoted And The Deranged">
+      <p className="dropCap">
+        Holy Flock is a home for films that feel discovered rather than manufactured. We are interested in the strange, the bruised, the devotional and the hard-to-explain: images that behave like relics, stories that leave residue, cinema that feels handmade and a little dangerous.
+      </p>
+      <p>
+        This is also our living style sheet. A place where the taste, the attitude, the choices and the rules of the world become visible, so everyone who comes near the work understands what belongs inside it.
+      </p>
+      <p>
+        <em>Less machinery. More belief. Less permission. More flock.</em>
+      </p>
+    </OverlayShell>
+  );
+}
+
+const SCORE_TRACKS = [
+  ["A Field Beneath The Furnaces", "03:14"],
+  ["Saint With A Broken Jaw", "01:48"],
+  ["No Choir, Just Breath", "04:02"],
+  ["The Lamb Watches The Rifle", "02:21"],
+  ["Black Dog Country", "05:30"],
+  ["End Credits For Something That Never Ended", "02:56"],
+];
+
+function ScoresOverlay({ close, setCursorMode, setHoverType }) {
+  const [playing, setPlaying] = useState(null);
+  return (
+    <OverlayShell close={close} marker="II / SCORES" title="Original Scores">
+      <div className="scoresList">
+        {SCORE_TRACKS.map(([title, duration], index) => (
+          <button
+            key={title}
+            className={`scoreTrack ${playing === index ? "playing" : ""}`}
+            onClick={() => setPlaying(playing === index ? null : index)}
+            onPointerEnter={() => {
+              setHoverType("score");
+              setCursorMode(playing === index ? "pause" : "play");
+            }}
+            onPointerLeave={() => {
+              setHoverType(null);
+              setCursorMode("drag");
+            }}
+          >
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{title}</strong>
+            <em>{duration}</em>
+            <div className="bars" aria-hidden="true">
+              {Array.from({ length: 12 }).map((_, i) => <i key={i} />)}
+            </div>
+          </button>
+        ))}
+      </div>
+    </OverlayShell>
+  );
+}
+
+function WriteOverlay({ close, setCursorMode, setHoverType }) {
+  return (
+    <OverlayShell close={close} marker="III / WRITE" title="Come Nearer">
+      <p>
+        For films, collaborations, screenings, strange commissions or devotional correspondence, write to the flock.
+      </p>
+      <a
+        href="mailto:luke@blacklabfilms.com"
+        className="emailButton"
+        onPointerEnter={() => {
+          setHoverType("email");
+          setCursorMode("write");
+        }}
+        onPointerLeave={() => {
+          setHoverType(null);
+          setCursorMode("drag");
+        }}
+      >
+        luke@blacklabfilms.com
+      </a>
+    </OverlayShell>
+  );
+}
+
+function OverlayShell({ marker, title, children, close }) {
+  return (
+    <motion.section
+      data-ui="true"
+      className="contentOverlay"
+      initial={{ opacity: 0, y: 28 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 28 }}
+      transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <button className="overlayClose" onClick={close}>×</button>
+      <p className="sectionMarker">{marker}</p>
+      <h1>{title}</h1>
+      <div className="overlayCopy">{children}</div>
+    </motion.section>
+  );
+}
+
+function LoadingGate({ loading }) {
+  return (
+    <AnimatePresence>
+      {loading && (
+        <motion.div className="loadingGate" initial={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <p>HOLY FLOCK FILMS</p>
+          <h1>Loading the wall</h1>
+          <div><span /></div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function MobileFallback() {
+  return (
+    <main className="mobileFallback">
+      <header>
+        <p>HOLY FLOCK FILMS</p>
+        <h1>Films, fragments and devotional cinema.</h1>
+      </header>
+      <section>
+        {FILMS.map((film) => (
+          <article key={film.title}>
+            <FilmVisual film={film} card={film.cards[0]} large />
+            <p>{film.number} / {film.year}</p>
+            <h2>{film.title}</h2>
+            <span>{film.runtime} · {film.format}</span>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+export default function HolyFlockDveinStyleSite() {
+  const size = useWindowSize();
+  const baseScale = clamp(size.width / REF_WIDTH, 0.6, 1.3);
+  const legalMinZoom = useMemo(() => {
+    const coverWidth = size.width / (BASE_WORLD.width * baseScale);
+    const coverHeight = size.height / (BASE_WORLD.height * baseScale);
+    return clamp(Math.max(coverWidth, coverHeight) * 1.015, MIN_ZOOM, MAX_ZOOM);
+  }, [size.width, size.height, baseScale]);
+  const introStartZoom = Math.max(INTRO_ZOOM_START, legalMinZoom);
+  const [zoom, setZoom] = useState(introStartZoom);
+  const [zoomTarget, setZoomTarget] = useState(introStartZoom);
+  const safeZoom = clamp(zoom, legalMinZoom, MAX_ZOOM);
+  const scale = baseScale * safeZoom;
+  const worldWidth = BASE_WORLD.width * scale;
+  const worldHeight = BASE_WORLD.height * scale;
+  const maxPan = useMemo(() => ({
+    x: Math.max(0, (worldWidth - size.width) / 2),
+    y: Math.max(0, (worldHeight - size.height) / 2),
+  }), [worldWidth, worldHeight, size.width, size.height]);
+
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [pointer, setPointer] = useState({ x: size.width / 2, y: size.height / 2 });
+  const [cursorMode, setCursorMode] = useState("drag");
+  const [hoverType, setHoverType] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const [activeCard, setActiveCard] = useState(0);
+  const [overlay, setOverlay] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const dragging = useRef(false);
+  const introZooming = useRef(true);
+  const lastPointer = useRef({ x: 0, y: 0 });
+  const downPointer = useRef({ x: 0, y: 0 });
+  const velocity = useRef({ x: 0, y: 0 });
+  const panRef = useRef(pan);
+  const suppressClickRef = useRef(false);
+  const hoverTypeRef = useRef(hoverType);
+
+  useEffect(() => { panRef.current = pan; }, [pan]);
+  useEffect(() => { hoverTypeRef.current = hoverType; }, [hoverType]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setLoading(false), 850);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    setZoom((current) => clamp(current, legalMinZoom, MAX_ZOOM));
+    setZoomTarget((current) => clamp(current, legalMinZoom, MAX_ZOOM));
+  }, [legalMinZoom]);
+
+  useEffect(() => {
+    if (loading) return undefined;
+
+    let raf;
+    const duration = 4800;
+    const started = performance.now();
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+
+    setZoom(introStartZoom);
+    setZoomTarget(introStartZoom);
+    introZooming.current = true;
+
+    const tick = (now) => {
+      if (!introZooming.current) return;
+      const t = clamp((now - started) / duration, 0, 1);
+      const nextZoom = introStartZoom + (INTRO_ZOOM_END - introStartZoom) * ease(t);
+      setZoom(nextZoom);
+      setZoomTarget(nextZoom);
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else introZooming.current = false;
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [loading, introStartZoom]);
+
+  useEffect(() => {
+    let raf;
+    const tick = () => {
+      if (!introZooming.current) {
+        setZoom((current) => {
+          const next = current + (zoomTarget - current) * 0.075;
+          return Math.abs(next - zoomTarget) < 0.001 ? zoomTarget : next;
+        });
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [zoomTarget]);
+
+  const clampPan = useCallback((next) => ({
+    x: clamp(next.x, -maxPan.x, maxPan.x),
+    y: clamp(next.y, -maxPan.y, maxPan.y),
+  }), [maxPan.x, maxPan.y]);
+
+  useEffect(() => {
+    const next = clampPan(panRef.current);
+    panRef.current = next;
+    setPan(next);
+  }, [clampPan]);
+
+  const cursorWorld = useMemo(() => ({
+    x: pointer.x - size.width / 2 - pan.x,
+    y: -(pointer.y - size.height / 2) - pan.y,
+  }), [pointer.x, pointer.y, size.width, size.height, pan.x, pan.y]);
+
+  const openFilm = useCallback((film) => {
+    setOverlay(null);
+    setSelected({ film });
+    // DVEIN-style behaviour: clicking any part of a cluster opens the film page with the trailer active by default.
+    setActiveCard("trailer");
+    setCursorMode("default");
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setSelected(null);
+    setCursorMode("drag");
+  }, []);
+
+  useEffect(() => {
+    let raf;
+    const tick = () => {
+      if (!dragging.current) {
+        const speed = Math.hypot(velocity.current.x, velocity.current.y);
+        if (speed > 0.08) {
+          const next = clampPan({
+            x: panRef.current.x + velocity.current.x,
+            y: panRef.current.y + velocity.current.y,
+          });
+          velocity.current.x *= 0.92;
+          velocity.current.y *= 0.92;
+          if (next.x === -maxPan.x || next.x === maxPan.x) velocity.current.x *= 0.25;
+          if (next.y === -maxPan.y || next.y === maxPan.y) velocity.current.y *= 0.25;
+          panRef.current = next;
+          setPan(next);
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [clampPan, maxPan.x, maxPan.y]);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        if (selected) closeModal();
+        else setOverlay(null);
+      }
+      if (selected && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+        setActiveCard((current) => {
+          const count = (selected.film.galleryCards?.length || selected.film.cards.length) + 1; // trailer tab + full image gallery
+          const currentIndex = current === "trailer" ? 0 : current + 1;
+          const nextIndex = e.key === "ArrowRight"
+            ? (currentIndex + 1) % count
+            : (currentIndex - 1 + count) % count;
+          return nextIndex === 0 ? "trailer" : nextIndex - 1;
+        });
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selected, closeModal]);
+
+  const handlePointerDown = (e) => {
+    if (e.target.closest?.("[data-ui='true']")) return;
+    if (selected || overlay) return;
+    dragging.current = true;
+    suppressClickRef.current = false;
+    lastPointer.current = { x: e.clientX, y: e.clientY };
+    downPointer.current = { x: e.clientX, y: e.clientY };
+    velocity.current = { x: 0, y: 0 };
+    setCursorMode("dragging");
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const handlePointerMove = (e) => {
+    setPointer({ x: e.clientX, y: e.clientY });
+    if (dragging.current) {
+      const dx = e.clientX - lastPointer.current.x;
+      const dy = e.clientY - lastPointer.current.y;
+      lastPointer.current = { x: e.clientX, y: e.clientY };
+      const next = clampPan({ x: panRef.current.x + dx, y: panRef.current.y - dy });
+      velocity.current = { x: dx * 0.92, y: -dy * 0.92 };
+      panRef.current = next;
+      setPan(next);
+      setCursorMode("dragging");
+      return;
+    }
+    if (!hoverTypeRef.current && !selected && !overlay) setCursorMode("drag");
+  };
+
+  const handlePointerUp = (e) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const moved = Math.hypot(e.clientX - downPointer.current.x, e.clientY - downPointer.current.y);
+    const wasDrag = moved > CLICK_SUPPRESS_DISTANCE;
+    suppressClickRef.current = wasDrag;
+
+    // Robust cluster click fallback. This fixes cases where the WebGL mesh itself does not receive the click.
+    if (!wasDrag && !selected && !overlay) {
+      const worldX = e.clientX - size.width / 2 - panRef.current.x;
+      const worldY = -(e.clientY - size.height / 2) - panRef.current.y;
+      let nearest = null;
+      let nearestDistance = Infinity;
+
+      for (const film of FILMS) {
+        const clusterX = film.position[0] * scale;
+        const clusterY = film.position[1] * scale;
+        const distance = Math.hypot(worldX - clusterX, worldY - clusterY);
+        if (distance < nearestDistance) {
+          nearest = film;
+          nearestDistance = distance;
+        }
+      }
+
+      if (nearest && nearestDistance < 430 * scale) {
+        openFilm(nearest);
+      }
+    }
+
+    window.setTimeout(() => { suppressClickRef.current = false; }, 90);
+    if (!hoverTypeRef.current) setCursorMode("drag");
+  };
+
+  const handleWheel = (e) => {
+    if (selected || overlay) return;
+    introZooming.current = false;
+    const direction = e.deltaY > 0 ? -1 : 1;
+    const amount = Math.min(0.045, Math.abs(e.deltaY) * 0.00045);
+    setZoomTarget((current) => clamp(current + direction * amount, legalMinZoom, MAX_ZOOM));
+  };
+
+  const navVisible = pointer.y > size.height * 0.72 || overlay !== null;
+
+  return (
+    <div className="siteRoot">
+      <StyleBlock />
+      <div
+        className="desktopExperience"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onWheel={handleWheel}
+      >
+        <Scene
+          pan={pan}
+          scale={scale}
+          cursorWorld={cursorWorld}
+          openFilm={openFilm}
+          suppressClickRef={suppressClickRef}
+          setCursorMode={setCursorMode}
+          setHoverType={setHoverType}
+        />
+
+        <div className="brandPlate" data-ui="true">
+          <p>HOLY FLOCK FILMS</p>
+          <span>Cardiff / Short films / Cult process wall</span>
+        </div>
+
+        <div className="coordinates" data-ui="true">
+          <span>{Math.round((pan.x + maxPan.x) / Math.max(1, maxPan.x * 2) * 100)} / X</span>
+          <span>{Math.round((pan.y + maxPan.y) / Math.max(1, maxPan.y * 2) * 100)} / Y</span>
+        </div>
+
+        <BottomNav
+          visible={navVisible}
+          overlay={overlay}
+          setOverlay={(next) => {
+            setSelected(null);
+            setOverlay(next);
+          }}
+          setCursorMode={setCursorMode}
+          setHoverType={setHoverType}
+        />
+
+        <AnimatePresence>
+          {overlay === "manifesto" && <ManifestoOverlay close={() => setOverlay(null)} />}
+          {overlay === "scores" && <ScoresOverlay close={() => setOverlay(null)} setCursorMode={setCursorMode} setHoverType={setHoverType} />}
+          {overlay === "write" && <WriteOverlay close={() => setOverlay(null)} setCursorMode={setCursorMode} setHoverType={setHoverType} />}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {selected && (
+            <FilmModal
+              selected={selected}
+              activeCard={activeCard}
+              setActiveCard={setActiveCard}
+              close={closeModal}
+              setCursorMode={setCursorMode}
+              setHoverType={setHoverType}
+            />
+          )}
+        </AnimatePresence>
+
+        <CustomCursor mode={cursorMode} />
+        <div className="grainOverlay" aria-hidden="true" />
+        <LoadingGate loading={loading} />
+      </div>
+      <MobileFallback />
+    </div>
+  );
+}
+
+function StyleBlock() {
+  return (
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Spectral:ital,wght@0,300;0,400;0,600;1,400&display=swap');
+
+      html, body, #root { margin: 0; width: 100%; min-height: 100%; background: #fafaf7; }
+      body { overflow: hidden; }
+      button, a { cursor: none; }
+      .siteRoot { width: 100vw; height: 100vh; background: #fafaf7; color: #1a1714; font-family: 'Spectral', serif; }
+      .desktopExperience { position: fixed; inset: 0; overflow: hidden; cursor: none; touch-action: none; user-select: none; }
+      .desktopExperience canvas { display: block; }
+
+      .brandPlate { position: fixed; top: 28px; left: 32px; z-index: 20; mix-blend-mode: multiply; pointer-events: none; }
+      .brandPlate p { margin: 0; font-family: 'Cinzel', serif; font-size: clamp(26px, 3.3vw, 54px); font-weight: 900; letter-spacing: -0.065em; line-height: 0.8; }
+      .brandPlate span { display: block; margin-top: 12px; font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; color: rgba(26,23,20,0.58); }
+
+      .coordinates { position: fixed; top: 34px; right: 34px; z-index: 20; display: flex; gap: 8px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.24em; color: rgba(26,23,20,0.5); pointer-events: none; }
+      .coordinates span { border: 1px solid rgba(26,23,20,0.16); border-radius: 999px; padding: 8px 10px; background: rgba(250,250,247,0.42); backdrop-filter: blur(8px); }
+
+      .customCursor { position: fixed; left: 0; top: 0; z-index: 1000; pointer-events: none; display: none; mix-blend-mode: difference; }
+      .cursorRing { position: absolute; left: 0; top: 0; width: 34px; height: 34px; transform: translate(-50%, -50%); border: 1.5px solid #fff; border-radius: 999px; transition: width 180ms ease, height 180ms ease, border-width 180ms ease, opacity 180ms ease; display: flex; align-items: center; justify-content: center; color: #fff; font-family: 'Cinzel', serif; font-weight: 900; font-size: 9px; letter-spacing: 0.18em; }
+      .cursorRing span { opacity: 0; transition: opacity 120ms ease; }
+      .cursorDot { position: absolute; left: 0; top: 0; width: 4px; height: 4px; transform: translate(-50%, -50%); border-radius: 999px; background: #fff; transition: opacity 120ms ease; }
+      .customCursor.drag .cursorRing, .customCursor.dragging .cursorRing, .customCursor.view .cursorRing, .customCursor.play .cursorRing, .customCursor.pause .cursorRing, .customCursor.write .cursorRing { width: 76px; height: 76px; }
+      .customCursor.view .cursorRing { width: 96px; height: 96px; border-width: 2px; }
+      .customCursor.write .cursorRing { width: 104px; height: 104px; }
+      .customCursor.drag .cursorRing span, .customCursor.dragging .cursorRing span, .customCursor.view .cursorRing span, .customCursor.play .cursorRing span, .customCursor.pause .cursorRing span, .customCursor.write .cursorRing span { opacity: 1; }
+      .customCursor.dragging .cursorDot, .customCursor.view .cursorDot, .customCursor.write .cursorDot { opacity: 0; }
+
+      .bottomNav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: grid; grid-template-columns: repeat(4, 1fr); transform: translateY(112%); transition: transform 420ms cubic-bezier(0.22,1,0.36,1); padding: 0 1.4vw 1.2vw; gap: 1vw; pointer-events: auto; }
+      .bottomNav.visible { transform: translateY(0); }
+      .bottomNav button { border: 1px solid rgba(26,23,20,0.16); background: rgba(250,250,247,0.56); backdrop-filter: blur(16px); color: #1a1714; font-family: 'Cinzel', serif; font-size: clamp(34px, 7.5vw, 126px); letter-spacing: -0.09em; line-height: 0.82; font-weight: 900; padding: 24px 12px 16px; border-radius: 24px; text-align: center; transition: background 180ms ease, color 180ms ease, transform 180ms ease; }
+      .bottomNav button:hover, .bottomNav button.active { background: #1a1714; color: #fafaf7; transform: translateY(-7px); }
+
+      .contentOverlay { position: fixed; inset: 5vh 4vw 18vh; z-index: 50; background: rgba(250,250,247,0.86); border: 1px solid rgba(26,23,20,0.18); backdrop-filter: blur(22px); border-radius: 34px; padding: clamp(28px, 5vw, 86px); overflow: auto; box-shadow: 0 34px 120px rgba(26,23,20,0.15); }
+      .overlayClose { position: fixed; top: 24px; right: 30px; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(26,23,20,0.2); background: transparent; color: #1a1714; font-size: 34px; line-height: 1; }
+      .sectionMarker { margin: 0 0 24px; font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.32em; color: rgba(26,23,20,0.48); }
+      .contentOverlay h1 { max-width: 1120px; margin: 0; font-family: 'Cinzel', serif; font-size: clamp(58px, 10vw, 168px); line-height: 0.82; letter-spacing: -0.095em; text-transform: uppercase; }
+      .overlayCopy { max-width: 920px; margin-top: clamp(34px, 5vw, 70px); font-size: clamp(20px, 2vw, 34px); line-height: 1.28; color: rgba(26,23,20,0.78); }
+      .overlayCopy p { margin: 0 0 1.1em; }
+      .overlayCopy em { font-family: 'Cormorant Garamond', serif; font-size: 1.15em; color: #1a1714; }
+      .dropCap::first-letter { float: left; font-family: 'Cinzel', serif; font-size: 5.4em; line-height: 0.74; padding-right: 0.08em; color: #1a1714; }
+
+      .scoresList { display: flex; flex-direction: column; gap: 10px; margin-top: 36px; }
+      .scoreTrack { position: relative; display: grid; grid-template-columns: 64px 1fr 90px 160px; align-items: center; gap: 18px; border: 1px solid rgba(26,23,20,0.14); background: rgba(255,255,255,0.22); padding: 18px 20px; color: #1a1714; text-align: left; border-radius: 22px; overflow: hidden; }
+      .scoreTrack span { font-family: 'Cinzel', serif; color: rgba(26,23,20,0.42); }
+      .scoreTrack strong { font-family: 'Cinzel', serif; font-size: clamp(26px, 4vw, 78px); letter-spacing: -0.06em; line-height: 0.86; text-transform: uppercase; }
+      .scoreTrack em { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: rgba(26,23,20,0.54); }
+      .bars { display: flex; align-items: center; justify-content: flex-end; gap: 4px; height: 54px; }
+      .bars i { display: block; width: 5px; height: 8px; background: #1a1714; opacity: 0.32; transform-origin: bottom; }
+      .scoreTrack.playing .bars i { animation: pulseBars 720ms infinite ease-in-out alternate; opacity: 0.88; }
+      .scoreTrack.playing .bars i:nth-child(2n) { animation-duration: 520ms; }
+      .scoreTrack.playing .bars i:nth-child(3n) { animation-duration: 940ms; }
+      @keyframes pulseBars { from { transform: scaleY(0.3); } to { transform: scaleY(5.4); } }
+
+      .emailButton { display: inline-block; margin-top: 30px; border: 1px solid #1a1714; border-radius: 999px; padding: 18px 28px; color: #1a1714; font-family: 'Cinzel', serif; font-size: clamp(22px, 4vw, 68px); font-weight: 900; letter-spacing: -0.06em; text-decoration: none; }
+      .emailButton:hover { background: #1a1714; color: #fafaf7; }
+
+      .modalBackdrop { position: fixed; inset: 0; z-index: 80; background: rgba(10,9,8,0.42); backdrop-filter: blur(10px); padding: 3.2vh 3vw; display: flex; align-items: stretch; justify-content: center; }
+      .filmModal { width: min(1680px, 94vw); max-height: 94vh; background: #fafaf7; color: #1a1714; border-radius: 32px; border: 1px solid rgba(26,23,20,0.18); box-shadow: 0 40px 160px rgba(0,0,0,0.34); display: grid; grid-template-rows: 128px 1fr; overflow: hidden; }
+      .thumbStrip { display: flex; align-items: center; gap: 12px; padding: 18px 22px; border-bottom: 1px solid rgba(26,23,20,0.14); overflow-x: auto; }
+      .thumb { position: relative; flex: 0 0 120px; height: 84px; border: 1px solid rgba(26,23,20,0.16); border-radius: 12px; padding: 0; overflow: hidden; background: transparent; opacity: 0.62; transform: translateY(0); transition: opacity 180ms ease, transform 180ms ease, border-color 180ms ease; }
+      .thumb.active, .thumb:hover { opacity: 1; transform: translateY(-4px); border-color: #1a1714; }
+      .thumb.trailerThumb::after { content: "TRAILER"; position: absolute; left: 7px; bottom: 7px; border-radius: 999px; background: rgba(26,23,20,0.86); color: #fafaf7; padding: 4px 7px 3px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 900; letter-spacing: 0.12em; }
+      .modalMain { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 0; }
+      .viewerArea { min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; background: #f1eee5; }
+      .vimeoWrap { width: min(100%, 1120px); aspect-ratio: 16 / 9; background: #000; border-radius: 24px; overflow: hidden; }
+      .vimeoWrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+      .vimeoNote { margin: 16px 0 0; max-width: 520px; text-align: center; font-size: 13px; color: rgba(26,23,20,0.54); }
+      .modalSide { border-left: 1px solid rgba(26,23,20,0.14); padding: 32px; overflow: auto; }
+      .modalSide h2 { margin: 0 0 22px; font-family: 'Cinzel', serif; font-size: 52px; line-height: 0.86; letter-spacing: -0.07em; text-transform: uppercase; }
+      .modalSide dl { display: grid; gap: 12px; margin: 0 0 24px; }
+      .modalSide dl div { border-bottom: 1px solid rgba(26,23,20,0.12); padding-bottom: 10px; }
+      .modalSide dt { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.24em; color: rgba(26,23,20,0.44); text-transform: uppercase; }
+      .modalSide dd { margin: 4px 0 0; font-family: 'Cormorant Garamond', serif; font-size: 23px; }
+      .modalSide p { font-size: 17px; line-height: 1.55; color: rgba(26,23,20,0.72); }
+      .closeButton { width: 100%; margin-top: 22px; border: 1px solid #1a1714; background: transparent; border-radius: 999px; padding: 14px 20px; font-family: 'Cinzel', serif; font-weight: 900; letter-spacing: 0.16em; }
+      .closeButton:hover { background: #1a1714; color: #fafaf7; }
+
+      .filmVisual { position: relative; width: 100%; height: 100%; overflow: hidden; background: #ddd0b8; color: #1a1714; }
+      .filmVisual.large { width: min(78vh, 72vw); height: min(78vh, 56vw); border-radius: 24px; box-shadow: 0 24px 80px rgba(26,23,20,0.18); }
+      .filmVisual.poster.large { width: min(56vh, 42vw); height: min(78vh, 58vw); }
+      .filmVisual.panorama.large { width: min(82vw, 1180px); height: min(36vh, 420px); }
+      .visualFrame { position: absolute; inset: 13%; border: 7px solid rgba(26,23,20,0.56); transform: rotate(-2deg); mix-blend-mode: multiply; }
+      .visualMarks::before, .visualMarks::after { content: ""; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.42); mix-blend-mode: screen; }
+      .visualMarks::before { left: 18%; top: 19%; width: 42%; height: 32%; }
+      .visualMarks::after { right: 10%; bottom: 18%; width: 32%; height: 44%; background: rgba(26,23,20,0.12); mix-blend-mode: multiply; }
+      .visualTitle { position: absolute; left: 8%; right: 8%; bottom: 7%; display: grid; gap: 6px; }
+      .visualTitle span { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; }
+      .filmVisual.large .visualTitle span { font-size: 14px; }
+      .visualTitle strong { font-family: 'Cinzel', serif; font-size: 20px; line-height: 0.88; letter-spacing: -0.06em; text-transform: uppercase; }
+      .filmVisual.large .visualTitle strong { font-size: clamp(38px, 5vw, 86px); }
+
+      .loadingGate { position: fixed; inset: 0; z-index: 2000; background: #fafaf7; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #1a1714; }
+      .loadingGate p { margin: 0 0 16px; font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.42em; color: rgba(26,23,20,0.46); }
+      .loadingGate h1 { margin: 0; font-family: 'Cinzel', serif; font-size: clamp(54px, 8vw, 128px); line-height: 0.84; letter-spacing: -0.08em; text-transform: uppercase; }
+      .loadingGate div { width: 260px; height: 2px; margin-top: 32px; background: rgba(26,23,20,0.12); overflow: hidden; }
+      .loadingGate div span { display: block; width: 44%; height: 100%; background: #1a1714; animation: loadingRun 880ms infinite ease-in-out; }
+      @keyframes loadingRun { 0% { transform: translateX(-110%); } 100% { transform: translateX(250%); } }
+
+      .grainOverlay { pointer-events: none; position: fixed; inset: 0; z-index: 15; opacity: 0.08; mix-blend-mode: multiply; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"); }
+
+      .mobileFallback { display: none; min-height: 100vh; background: #fafaf7; padding: 24px; color: #1a1714; }
+      .mobileFallback header p { margin: 0 0 12px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.34em; color: rgba(26,23,20,0.48); }
+      .mobileFallback header h1 { margin: 0 0 34px; font-family: 'Cinzel', serif; font-size: 52px; line-height: 0.86; letter-spacing: -0.08em; text-transform: uppercase; }
+      .mobileFallback section { display: grid; gap: 28px; }
+      .mobileFallback article { border-top: 1px solid rgba(26,23,20,0.18); padding-top: 22px; }
+      .mobileFallback article .filmVisual { height: 320px; border-radius: 18px; }
+      .mobileFallback article p { margin: 16px 0 4px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.24em; color: rgba(26,23,20,0.5); }
+      .mobileFallback article h2 { margin: 0; font-family: 'Cinzel', serif; font-size: 34px; line-height: 0.9; letter-spacing: -0.06em; text-transform: uppercase; }
+      .mobileFallback article span { display: block; margin-top: 8px; font-family: 'Cormorant Garamond', serif; font-size: 20px; color: rgba(26,23,20,0.62); }
+
+      @media (pointer: fine) {
+        .customCursor { display: block; }
+      }
+
+      @media (max-width: 820px), (pointer: coarse) {
+        body { overflow: auto; }
+        .desktopExperience { display: none; }
+        .mobileFallback { display: block; }
+      }
+
+      @media (max-width: 1050px) {
+        .modalMain { grid-template-columns: 1fr; overflow: auto; }
+        .modalSide { border-left: 0; border-top: 1px solid rgba(26,23,20,0.14); }
+        .filmModal { overflow: auto; }
+        .bottomNav { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      /* DVEIN-style dark film page override */
+      .modalBackdrop { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,0.94); backdrop-filter: blur(16px); padding: 0; display: block; }
+      .filmModal { position: fixed; inset: 0; width: 100vw; max-height: none; background: #020202; color: #ede1c8; border-radius: 0; border: 0; box-shadow: none; display: grid; grid-template-rows: 126px 1fr; overflow: hidden; }
+      .filmModal::before { content: ""; position: absolute; left: 1.2vw; right: 1.2vw; top: 128px; bottom: 32px; border: 1px solid rgba(201,169,97,0.34); pointer-events: none; }
+      .thumbStrip { position: relative; z-index: 3; display: flex; align-items: center; gap: 14px; padding: 24px 28px 16px; border-bottom: 1px solid rgba(201,169,97,0.22); overflow-x: auto; background: linear-gradient(to bottom, rgba(0,0,0,0.98), rgba(0,0,0,0.82)); }
+      .thumbRail { display: flex; align-items: center; gap: 14px; flex: 0 0 auto; }
+      .thumb { position: relative; flex: 0 0 118px; height: 72px; border: 1px solid rgba(201,169,97,0.18); border-radius: 0; padding: 0; overflow: hidden; background: #050505; opacity: 0.5; transform: translateY(0); transition: opacity 180ms ease, transform 180ms ease, border-color 180ms ease; }
+      .thumb:first-child { flex-basis: 66px; height: 102px; }
+      .thumb.active, .thumb:hover { opacity: 1; transform: translateY(-4px); border-color: rgba(201,169,97,0.86); }
+      .thumb.trailerThumb::after { content: "TRAILER"; position: absolute; left: 7px; bottom: 7px; border-radius: 999px; background: rgba(237,225,200,0.92); color: #020202; padding: 4px 7px 3px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 900; letter-spacing: 0.12em; }
+      .modalMain { position: relative; z-index: 2; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 0; }
+      .viewerArea { min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 34px 28px 48px 56px; background: #020202; }
+      .vimeoWrap { width: min(calc(100vw - 500px), calc((100vh - 220px) * 1.777)); aspect-ratio: 16 / 9; background: #000; border-radius: 0; overflow: hidden; box-shadow: 0 0 80px rgba(0,0,0,0.75); }
+      .vimeoWrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+      .vimeoNote { margin: 16px 0 0; max-width: 520px; text-align: center; font-size: 13px; color: rgba(237,225,200,0.54); }
+      .modalSide { border-left: 1px solid rgba(201,169,97,0.18); padding: 48px 42px 42px; overflow: auto; background: rgba(0,0,0,0.18); cursor: none; }
+      .modalInfo { cursor: none; }
+      .modalSide h2 { margin: 0 0 18px; font-family: 'Cinzel', serif; font-size: 21px; line-height: 1.18; letter-spacing: 0.02em; text-transform: uppercase; color: #ede1c8; }
+      .modalSide dl { display: grid; gap: 6px; margin: 0 0 28px; }
+      .modalSide dl div { border-bottom: 0; padding-bottom: 0; }
+      .modalSide dt { display: none; }
+      .modalSide dd { margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 15px; font-style: italic; color: rgba(237,225,200,0.62); }
+      .modalSide p { font-size: 15px; line-height: 1.65; color: rgba(237,225,200,0.74); }
+      .filmPageClose { position: fixed; top: 42px; right: 40px; z-index: 20; border: 1px solid rgba(201,169,97,0.38); background: rgba(0,0,0,0.35); color: rgba(237,225,200,0.82); border-radius: 999px; padding: 10px 14px; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 0.26em; text-transform: uppercase; }
+      .filmPageClose:hover { color: #020202; background: #ede1c8; }
+      .closeButton { position: static; width: 100%; margin-top: 28px; border: 1px solid rgba(201,169,97,0.36); background: transparent; border-radius: 999px; padding: 13px 16px; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 0.22em; color: rgba(237,225,200,0.72); text-transform: uppercase; }
+      .closeButton::after { content: " ×"; }
+      .closeButton:hover { background: transparent; color: #ede1c8; }
+      .filmVisual.large { width: min(calc(100vw - 500px), calc((100vh - 220px) * 1.777)); height: min(calc((100vw - 500px) * 0.5625), calc(100vh - 220px)); border-radius: 0; box-shadow: 0 0 80px rgba(0,0,0,0.7); }
+      .filmVisual.poster.large { width: min(48vh, 34vw); height: min(72vh, 650px); }
+      .filmVisual.panorama.large { width: min(82vw, 1180px); height: min(36vh, 420px); }
+      .sectionMarker { color: rgba(201,169,97,0.88); }
+
+    `}</style>
+  );
+}
