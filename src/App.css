@@ -63,7 +63,7 @@ button { font: inherit; }
   position: fixed;
   inset: 0 0 auto;
   height: var(--nav-h);
-  z-index: 20;
+  z-index: 80;
   display: grid;
   grid-template-columns: minmax(150px, 1fr) minmax(420px, 1.8fr) minmax(70px, 1fr);
   align-items: center;
@@ -71,17 +71,15 @@ button { font: inherit; }
   padding: clamp(14px, 2vw, 28px) clamp(18px, 2.6vw, 42px);
   border-bottom: 1px solid currentColor;
   color: var(--ink);
-  transition: color 700ms ease, border-color 700ms ease;
+  background: var(--paper);
+  transition: background 700ms ease, color 700ms ease, border-color 700ms ease;
+  box-shadow: 0 1px 0 rgba(21, 19, 15, 0.08);
 }
-.site-nav.dark { color: var(--cream); }
-.brand-wordmark, .nav-link, .nav-emblem { background: transparent; border: 0; color: inherit; cursor: pointer; }
-.brand-wordmark {
-  justify-self: start;
-  font-family: "Cinzel", Georgia, serif;
-  font-size: clamp(12px, 1vw, 18px);
-  font-weight: 700;
-  letter-spacing: .16em;
-  text-align: left;
+.site-nav.dark {
+  color: var(--cream);
+  background: var(--dark);
+  border-bottom-color: rgba(232, 222, 203, 0.22);
+  box-shadow: 0 1px 0 rgba(232, 222, 203, 0.08);
 }
 .nav-links {
   justify-self: center;
