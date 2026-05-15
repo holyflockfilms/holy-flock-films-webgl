@@ -298,3 +298,296 @@ dd { margin: 0; font-size: clamp(15px, 1vw, 18px); }
   .asset-grid { grid-template-columns: 1fr; }
   .detail-item { width: 86vw; }
 }
+
+/* HF FIXED STACK REFERENCE START */
+
+/*
+  Fixed reference stack for the FILMS page.
+  This deliberately avoids the slider/variable system and matches the supplied
+  reference: one dominant front image with two smaller straight-on layers
+  staggered behind on each side.
+*/
+
+.film-card {
+  min-width: 0;
+  --film-card-frame: 74%;
+}
+
+.film-stack {
+  position: relative !important;
+  display: block !important;
+  width: var(--film-card-frame) !important;
+  margin: 0 auto !important;
+  aspect-ratio: 16 / 8.4 !important;
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  perspective: 1000px !important;
+  overflow: visible !important;
+  isolation: isolate !important;
+}
+
+.film-stack .stack-img {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  object-fit: cover !important;
+  box-shadow: 0 18px 50px rgba(0,0,0,.22) !important;
+  transition:
+    transform 520ms cubic-bezier(.22,1,.36,1),
+    opacity 420ms ease !important;
+}
+
+/* Main/front image */
+.film-stack .stack-img.stack-main {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 50 !important;
+  opacity: 1 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+/* Outer left/right images — smaller, further back, just peeking out */
+.film-stack .stack-img.stack-img-0,
+.film-stack .stack-img.stack-img-3 {
+  width: 74% !important;
+  height: 86% !important;
+  z-index: 10 !important;
+  opacity: .48 !important;
+}
+
+/* Inner left/right images — closer to the main image */
+.film-stack .stack-img.stack-img-1,
+.film-stack .stack-img.stack-img-2 {
+  width: 82% !important;
+  height: 92% !important;
+  z-index: 20 !important;
+  opacity: .62 !important;
+}
+
+/* Resting positions */
+.film-stack .stack-img.stack-img-0 {
+  transform: translate(-88%, -50%) scale(.92) !important;
+}
+
+.film-stack .stack-img.stack-img-1 {
+  transform: translate(-68%, -50%) scale(.96) !important;
+}
+
+.film-stack .stack-img.stack-img-2 {
+  transform: translate(-32%, -50%) scale(.96) !important;
+}
+
+.film-stack .stack-img.stack-img-3 {
+  transform: translate(-12%, -50%) scale(.92) !important;
+}
+
+/* Hover reveal — images slide out from behind the main image */
+.film-stack:hover .stack-img.stack-img-0 {
+  opacity: .62 !important;
+  transform: translate(-98%, -50%) scale(.93) !important;
+}
+
+.film-stack:hover .stack-img.stack-img-1 {
+  opacity: .76 !important;
+  transform: translate(-76%, -50%) scale(.98) !important;
+}
+
+.film-stack:hover .stack-img.stack-img-2 {
+  opacity: .76 !important;
+  transform: translate(-24%, -50%) scale(.98) !important;
+}
+
+.film-stack:hover .stack-img.stack-img-3 {
+  opacity: .62 !important;
+  transform: translate(-2%, -50%) scale(.93) !important;
+}
+
+.film-stack:hover .stack-img.stack-main {
+  transform: translate(-50%, -50%) scale(1.01) !important;
+}
+
+.film-caption {
+  width: var(--film-card-frame) !important;
+  margin: 8px auto 0 !important;
+  text-align: left !important;
+}
+
+.films-page .film-caption .logline {
+  max-width: min(48ch, 100%) !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.films-page .film-caption .eyebrow,
+.films-page .film-caption h2,
+.films-page .film-caption .rule,
+.films-page .film-caption .meta {
+  margin-left: 0 !important;
+}
+
+/* HF FIXED STACK REFERENCE END */
+
+/* HF TEXT SCALE 70 START */
+
+/*
+  Typography tightening pass.
+  Keeps the fixed image-stack layout intact, but reduces page text and
+  locks film captions/copy to the same left edge as the main image.
+*/
+
+:root {
+  --hf-text-scale-note: .7;
+}
+
+/* Main FILMS title */
+.hero-title {
+  padding: 0 20px clamp(3px, .9vw, 14px) !important;
+}
+
+.hero-title h1 {
+  font-size: clamp(20px, min(2.35vw, 3.8vh), 44px) !important;
+  letter-spacing: .13em !important;
+  line-height: 1.04 !important;
+}
+
+.hero-title h1 span {
+  font-size: .62em !important;
+  margin: 0 .17em !important;
+}
+
+.hero-title h1 span::after {
+  width: 56% !important;
+}
+
+.crosshair {
+  margin-top: clamp(10px, 1.2vw, 18px) !important;
+  font-size: 18px !important;
+}
+
+/* Film landing page captions aligned to main image */
+.film-caption {
+  width: var(--film-card-frame) !important;
+  margin: 8px auto 0 !important;
+  text-align: left !important;
+}
+
+.films-page .film-caption .eyebrow,
+.films-page .film-caption h2,
+.films-page .film-caption .rule,
+.films-page .film-caption .logline,
+.films-page .film-caption .meta {
+  margin-left: 0 !important;
+  text-align: left !important;
+}
+
+/* Film landing page text roughly 70% of the larger version */
+.films-page .eyebrow,
+.films-page .meta {
+  font-size: clamp(7px, .48vw, 9px) !important;
+  letter-spacing: .17em !important;
+}
+
+.films-page .film-caption h2 {
+  font-size: clamp(13px, 1.04vw, 21px) !important;
+  letter-spacing: .045em !important;
+  line-height: 1.02 !important;
+  font-weight: 500 !important;
+}
+
+.films-page .rule {
+  width: 22px !important;
+  margin: 7px 0 !important;
+}
+
+.films-page .logline,
+.films-page .film-caption p {
+  max-width: min(48ch, 100%) !important;
+  font-size: clamp(10.5px, .78vw, 14px) !important;
+  line-height: 1.3 !important;
+}
+
+.films-page .meta {
+  margin-top: 7px !important;
+}
+
+/* Selected film page title and intro */
+.selected-title {
+  max-width: 640px !important;
+  margin: 0 auto clamp(20px, 3vw, 46px) !important;
+}
+
+.selected-title h1 {
+  font-size: clamp(25px, 3.15vw, 56px) !important;
+  line-height: 1.02 !important;
+}
+
+.selected-title p:last-child {
+  font-size: clamp(13px, .98vw, 17px) !important;
+  line-height: 1.32 !important;
+}
+
+/* Four-option film selection page */
+.asset-card h2 {
+  font-size: clamp(15px, 1.4vw, 27px) !important;
+  line-height: 1.03 !important;
+  min-height: 2.2em !important;
+}
+
+.asset-card p {
+  font-size: clamp(12px, .95vw, 15.5px) !important;
+  line-height: 1.34 !important;
+  max-width: 34ch !important;
+}
+
+.asset-action {
+  font-size: clamp(7px, .52vw, 9px) !important;
+}
+
+/* Expanded detail carousel page */
+.detail-item h2 {
+  font-size: clamp(20px, 2.1vw, 39px) !important;
+}
+
+.detail-copy {
+  max-width: 820px !important;
+}
+
+.detail-copy h1 {
+  font-size: clamp(18px, 2.25vw, 39px) !important;
+  line-height: 1.05 !important;
+}
+
+.detail-copy p {
+  font-size: clamp(13px, 1vw, 17px) !important;
+  line-height: 1.38 !important;
+  max-width: 44ch !important;
+}
+
+dt {
+  font-size: clamp(7px, .52vw, 9px) !important;
+}
+
+dd {
+  font-size: clamp(10.5px, .75vw, 13px) !important;
+}
+
+/* Panel overlays */
+.panel-overlay h1 {
+  font-size: clamp(29px, 4.2vw, 70px) !important;
+}
+
+.panel-overlay p {
+  font-size: clamp(13px, 1.12vw, 20px) !important;
+  line-height: 1.38 !important;
+}
+
+/* Top navigation: slightly smaller but still readable */
+.brand-wordmark,
+.nav-link,
+.nav-year {
+  font-size: clamp(8px, .62vw, 10px) !important;
+}
+
+/* HF TEXT SCALE 70 END */

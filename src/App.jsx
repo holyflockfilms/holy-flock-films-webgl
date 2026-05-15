@@ -58,8 +58,9 @@ function FilmStack({ film, onSelect }) {
   return (
     <article className="film-card">
       <button className="film-stack" onClick={() => onSelect(film.id)} aria-label={`Open ${film.title}`}>
-        {stack.slice(0, 5).map((src, i) => {
-          const offset = i - 2;
+        {stack.slice(0, 4).map((src, i) => {
+          const offsets = [-2, -1, 1, 2];
+          const offset = offsets[i] ?? 0;
           return (
             <img
               key={`${src}-${i}`}
