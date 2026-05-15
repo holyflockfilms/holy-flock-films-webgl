@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { films, siteConfig } from "./data/filmsData";
 
@@ -61,6 +61,7 @@ function FilmStack({ film, onSelect }) {
         {stack.slice(0, 4).map((src, i) => {
           const offsets = [-2, -1, 1, 2];
           const offset = offsets[i] ?? 0;
+
           return (
             <img
               key={`${src}-${i}`}
@@ -82,7 +83,9 @@ function FilmStack({ film, onSelect }) {
         <h2>{film.title}</h2>
         <div className="rule" />
         <p className="logline">{film.logline}</p>
-        <p className="meta">{film.year} <span>·</span> {film.runtime}</p>
+        <p className="meta">
+          {film.year} <span>·</span> {film.runtime}
+        </p>
       </div>
     </article>
   );
@@ -109,6 +112,7 @@ function FilmsPage({ onSelectFilm }) {
 
 function cleanVimeoUrl(url) {
   if (!url) return "";
+
   try {
     const parsed = new URL(url);
     parsed.searchParams.set("autoplay", "1");
@@ -125,11 +129,29 @@ function cleanVimeoUrl(url) {
   }
 }
 
+function getAssetDisplay(asset) {
+  if (asset.display) return asset.display;
+  if (asset.video) return "video";
+  if (asset.id === "poster") return "portrait";
+  if (asset.id === "synopsis" || asset.id === "pitch") return "document";
+  return "landscape";
+}
+
+function getAssetPreviewSrc(asset) {
+  return asset.previewImage || asset.image || asset.fullImage || "";
+}
+
+function getAssetFullSrc(asset) {
+  return asset.fullImage || asset.image || asset.previewImage || "";
+}
+
 function AssetMedia({ asset, large = false }) {
+  const display = getAssetDisplay(asset);
+
   if (asset.video && large) {
     return (
       <iframe
-        className="asset-video"
+        className={`asset-video asset-media-display-${display}`}
         src={cleanVimeoUrl(asset.video)}
         title={asset.title}
         allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -138,7 +160,15 @@ function AssetMedia({ asset, large = false }) {
     );
   }
 
-  return <img src={asset.image} alt={asset.title} />;
+  const src = large ? getAssetFullSrc(asset) : getAssetPreviewSrc(asset);
+
+  return (
+    <img
+      className={`asset-img asset-media-display-${display}`}
+      src={src}
+      alt={asset.title}
+    />
+  );
 }
 
 function AssetGrid({ film, onChoose }) {
@@ -151,83 +181,114 @@ function AssetGrid({ film, onChoose }) {
             <AssetMedia asset={asset} />
           </div>
           <p>{asset.description}</p>
-          <span className="asset-action">{asset.action} <span>→</span></span>
+          <span className="asset-action">
+            {asset.action} <span>→</span>
+          </span>
         </button>
       ))}
     </section>
   );
 }
 
-function AssetDetail({ film, activeId, setActiveId }) {
+function AssetModal({ film, activeId, setActiveId, onClose }) {
   const activeIndex = Math.max(0, film.assets.findIndex((asset) => asset.id === activeId));
-  const active = film.assets[activeIndex];
-
-  const ordered = useMemo(() => {
-    return film.assets.map((asset, index) => ({
-      ...asset,
-      position: index - activeIndex,
-    }));
-  }, [film.assets, activeIndex]);
+  const active = film.assets[activeIndex] || film.assets[0];
+  const display = getAssetDisplay(active);
+  const metaEntries = Object.entries(active.meta || film.meta || {});
 
   return (
-    <section className="asset-detail" aria-label={`${film.title} ${active.title}`}>
-      <div className="asset-carousel">
-        {ordered.map((asset) => {
-          const isActive = asset.id === active.id;
-          return (
-            <button
-              key={asset.id}
-              className={`detail-item ${isActive ? "active" : "side"}`}
-              style={{ "--pos": asset.position }}
-              onClick={() => setActiveId(asset.id)}
-            >
-              <h2>{asset.title}</h2>
-              <div className="detail-media">
-                <AssetMedia asset={asset} large={isActive} />
-              </div>
-            </button>
-          );
-        })}
-      </div>
+    <div
+      className="asset-modal-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <section
+        className={`asset-modal asset-modal-${display}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${film.title} ${active.title}`}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <button className="asset-modal-close" onClick={onClose}>
+          CLOSE X
+        </button>
 
-      <div className="detail-copy">
-        <div>
-          <p className="eyebrow">{film.type}</p>
-          <h1>{active.title}</h1>
-          <p>{active.longDescription || active.description}</p>
+        <div className="asset-modal-media-wrap">
+          <div className={`asset-modal-media ${display}`}>
+            <AssetMedia asset={active} large />
+          </div>
         </div>
 
-        <dl>
-          {Object.entries(active.meta || film.meta || {}).map(([label, value]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </section>
+        <aside className="asset-modal-copy">
+          <p className="eyebrow">{film.title}</p>
+          <h1>{active.title}</h1>
+          <p>{active.longDescription || active.description}</p>
+
+          {metaEntries.length > 0 && (
+            <dl>
+              {metaEntries.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
+          <div className="asset-modal-selector" aria-label="Film option selector">
+            {film.assets.map((asset) => (
+              <button
+                key={asset.id}
+                className={asset.id === active.id ? "active" : ""}
+                onClick={() => setActiveId(asset.id)}
+              >
+                {asset.title}
+              </button>
+            ))}
+          </div>
+        </aside>
+      </section>
+    </div>
   );
 }
 
 function FilmSelectedPage({ film, onBack }) {
   const [activeAsset, setActiveAsset] = useState(null);
 
+  useEffect(() => {
+    if (!activeAsset) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setActiveAsset(null);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [activeAsset]);
+
   return (
     <main className="film-selected-page">
-      <button className="back-button" onClick={onBack}>← BACK TO FILMS</button>
+      <button className="back-button" onClick={onBack}>
+        BACK TO FILMS
+      </button>
 
-      {!activeAsset ? (
-        <>
-          <section className="selected-title">
-            <p className="eyebrow">{film.type}</p>
-            <h1>{film.title}</h1>
-            <p>{film.logline}</p>
-          </section>
-          <AssetGrid film={film} onChoose={setActiveAsset} />
-        </>
-      ) : (
-        <AssetDetail film={film} activeId={activeAsset} setActiveId={setActiveAsset} />
+      <section className="selected-title">
+        <p className="eyebrow">{film.type}</p>
+        <h1>{film.title}</h1>
+        <p>{film.logline}</p>
+      </section>
+
+      <AssetGrid film={film} onChoose={setActiveAsset} />
+
+      {activeAsset && (
+        <AssetModal
+          film={film}
+          activeId={activeAsset}
+          setActiveId={setActiveAsset}
+          onClose={() => setActiveAsset(null)}
+        />
       )}
     </main>
   );
@@ -246,7 +307,9 @@ function PanelOverlay({ panel, onClose }) {
 
   return (
     <aside className="panel-overlay">
-      <button onClick={onClose} className="panel-close">CLOSE ×</button>
+      <button onClick={onClose} className="panel-close">
+        CLOSE ×
+      </button>
       <p className="eyebrow">{panel}</p>
       <h1>{panel.toUpperCase()}</h1>
       <p>{copy[panel] || "Coming soon."}</p>
@@ -276,10 +339,12 @@ export default function App() {
       {selectedFilm ? (
         <FilmSelectedPage film={selectedFilm} onBack={goFilms} />
       ) : (
-        <FilmsPage onSelectFilm={(id) => {
-          setPanel(null);
-          setSelectedFilmId(id);
-        }} />
+        <FilmsPage
+          onSelectFilm={(id) => {
+            setPanel(null);
+            setSelectedFilmId(id);
+          }}
+        />
       )}
 
       <PanelOverlay panel={panel} onClose={() => setPanel(null)} />
