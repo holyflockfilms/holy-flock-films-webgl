@@ -2,7 +2,13 @@ HOLY FLOCK FILMS — ALL FILMS IMAGE REPORT
 ======================================================
 
 Public root: /images/films
-Film count: 3
+Film count: 5
+
+FILM: 16X9 Poster (1P)
+Slug: 16x9-poster
+Images: 1
+------------------------------------------------------
+  POSTER | poster | 900x506 thumb | 1600x900 large
 
 FILM: Do Not Feed The Animals (DNFTA)
 Slug: donotfeedtheanimals
@@ -39,6 +45,12 @@ Images: 14
   STILL 11 | wide | 960x720 thumb | 1707x1280 large
   STILL 12 | wide | 960x720 thumb | 1707x1280 large
   STILL 13 | wide | 960x720 thumb | 1707x1280 large
+
+FILM: Invitation To An Execution (ITAE)
+Slug: invitation-to-an-execution
+Images: 1
+------------------------------------------------------
+  POSTER | poster | 900x506 thumb | 1600x900 large
 
 FILM: Love Me Hold Me Always (LMHMA)
 Slug: lovemeholdmealways

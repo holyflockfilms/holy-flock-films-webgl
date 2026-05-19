@@ -3,6 +3,30 @@
   "publicRoot": "/images/films",
   "films": [
     {
+      "title": "16X9 Poster",
+      "slug": "16x9-poster",
+      "prefix": "1P",
+      "folder": "D:\\Holy Flock\\LoveMeHoldMeAlways\\16x9 Poster",
+      "imageCount": 1,
+      "images": [
+        {
+          "source": "D:\\Holy Flock\\LoveMeHoldMeAlways\\16x9 Poster\\LMHMA_POSTER_16x9.jpg",
+          "role": "poster",
+          "type": "poster",
+          "label": "POSTER",
+          "thumb": "/images/films/16x9-poster/1P-poster-thumb.webp",
+          "large": "/images/films/16x9-poster/1P-poster-large.webp",
+          "width": 3840,
+          "height": 2160,
+          "aspect": 1.7778,
+          "thumb_width": 900,
+          "thumb_height": 506,
+          "large_width": 1600,
+          "large_height": 900
+        }
+      ]
+    },
+    {
       "title": "Do Not Feed The Animals",
       "slug": "donotfeedtheanimals",
       "prefix": "DNFTA",
@@ -407,6 +431,30 @@
           "thumb_height": 720,
           "large_width": 1707,
           "large_height": 1280
+        }
+      ]
+    },
+    {
+      "title": "Invitation To An Execution",
+      "slug": "invitation-to-an-execution",
+      "prefix": "ITAE",
+      "folder": "D:\\Holy Flock\\Invitation To An Execution",
+      "imageCount": 1,
+      "images": [
+        {
+          "source": "D:\\Holy Flock\\Invitation To An Execution\\Invitation to an Execution Poster V6D 16x9 Version.jpg",
+          "role": "poster",
+          "type": "poster",
+          "label": "POSTER",
+          "thumb": "/images/films/invitation-to-an-execution/ITAE-poster-thumb.webp",
+          "large": "/images/films/invitation-to-an-execution/ITAE-poster-large.webp",
+          "width": 3840,
+          "height": 2160,
+          "aspect": 1.7778,
+          "thumb_width": 900,
+          "thumb_height": 506,
+          "large_width": 1600,
+          "large_height": 900
         }
       ]
     },

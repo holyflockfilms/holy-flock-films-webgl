@@ -2,6 +2,190 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { films, siteConfig } from "./data/filmsData";
 
+const LANDING_ASSETS = {
+  landing01: {
+    title: "/images/landingpage01/Landing_Page_01_HolyFlockFilms.png",
+    eye: "/images/landingpage01/Landing_Page_01_Eye.png",
+    sheep: "/images/landingpage01/Landing_Page_01_Sheep.png",
+    enter: "/images/landingpage01/Landing_Page_01_EnterAtYourPeril.png",
+  },
+  landing02: {
+    background: "/images/landingpage02/ChatGPT Image May 19, 2026, 12_08_40 PM.png",
+    music: "/images/landingpage02/map-music (1).webp",
+    join: "/images/landingpage02/map-join-the-flock.webp",
+    film: "/images/landingpage02/map-film.webp",
+    about: "/images/landingpage02/map-about.webp",
+    pitch: "/images/landingpage02/map-pitch-slate.webp",
+  },
+};
+
+function LandingPageOne({ onEnter }) {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "Enter" || event.key === " ") onEnter();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onEnter]);
+
+  return (
+    <main className="landing-page landing-page-one" aria-label="Holy Flock Films entrance">
+      <button className="landing-one-hit-area" onClick={onEnter}>
+        <span className="landing-one-grain" aria-hidden="true" />
+        <span className="landing-one-rays" aria-hidden="true" />
+
+        <span className="landing-one-frame landing-one-frame-top" aria-hidden="true" />
+        <span className="landing-one-frame landing-one-frame-bottom" aria-hidden="true" />
+        <span className="landing-one-frame landing-one-frame-left" aria-hidden="true" />
+        <span className="landing-one-frame landing-one-frame-right" aria-hidden="true" />
+
+        <span className="landing-one-corner landing-one-corner-tl" aria-hidden="true">✣</span>
+        <span className="landing-one-corner landing-one-corner-tr" aria-hidden="true">✣</span>
+        <span className="landing-one-corner landing-one-corner-bl" aria-hidden="true">✣</span>
+        <span className="landing-one-corner landing-one-corner-br" aria-hidden="true">✣</span>
+
+        <span className="landing-side-word landing-side-word-left">
+          <span>DEVOTED</span>
+          <i aria-hidden="true" />
+        </span>
+        <span className="landing-side-word landing-side-word-right">
+          <span>DERANGED</span>
+          <i aria-hidden="true" />
+        </span>
+
+        <div className="landing-one-eye-code" aria-hidden="true">
+          <EyeEmblem />
+        </div>
+
+        <img className="landing-one-title" src={LANDING_ASSETS.landing01.title} alt="Holy Flock Films" />
+        <img className="landing-one-sheep" src={LANDING_ASSETS.landing01.sheep} alt="Holy Flock sheep" />
+        <img className="landing-one-enter" src={LANDING_ASSETS.landing01.enter} alt="Enter at your peril" />
+
+        <span className="landing-one-hint">CLICK TO ENTER</span>
+
+        <div className="landing-one-footer" aria-hidden="true">
+          <div className="landing-one-footer-cell">
+            <span>FILMS FOR THE</span>
+            <strong>DAMNED &amp; THE DEVOTED</strong>
+            <em>+</em>
+          </div>
+          <span className="landing-one-footer-rule" />
+          <div className="landing-one-footer-cell landing-one-footer-centre">
+            <strong>CULT CINEMA. DIVINE VISION.</strong>
+            <i />
+          </div>
+          <span className="landing-one-footer-rule" />
+          <div className="landing-one-footer-cell">
+            <strong>SOUND OFF</strong>
+            <em className="landing-sound-mark">◖))</em>
+          </div>
+        </div>
+      </button>
+    </main>
+  );
+}
+
+function LandingPageTwo({ onEnterFilms, onPanel, onBack }) {
+  const mapItems = [
+    {
+      id: "music",
+      label: "MUSIC",
+      src: LANDING_ASSETS.landing02.music,
+      className: "map-music",
+      onClick: () => onPanel("music"),
+    },
+    {
+      id: "join",
+      label: "JOIN THE FLOCK",
+      src: LANDING_ASSETS.landing02.join,
+      className: "map-join",
+      onClick: () => onPanel("join"),
+    },
+    {
+      id: "film",
+      label: "FILM",
+      src: LANDING_ASSETS.landing02.film,
+      className: "map-film",
+      onClick: onEnterFilms,
+    },
+    {
+      id: "about",
+      label: "ABOUT",
+      src: LANDING_ASSETS.landing02.about,
+      className: "map-about",
+      onClick: () => onPanel("about"),
+    },
+    {
+      id: "pitch",
+      label: "PITCH SLATE",
+      src: LANDING_ASSETS.landing02.pitch,
+      className: "map-pitch",
+      onClick: () => onPanel("pitch"),
+    },
+  ];
+
+  return (
+    <main className="landing-page landing-page-map" aria-label="Holy Flock Films graphical menu">
+      <button className="landing-map-back" onClick={onBack}>
+        BACK
+      </button>
+
+      <img className="landing-map-background" src={LANDING_ASSETS.landing02.background} alt="" />
+
+      <div className="landing-map-overlay" aria-hidden="true" />
+
+      <section className="landing-map-objects" aria-label="Holy Flock navigation">
+        {mapItems.map((item) => (
+          <button key={item.id} className={`map-object ${item.className}`} onClick={item.onClick}>
+            <img src={item.src} alt="" />
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+
+function EyeEmblem() {
+  return (
+    <svg
+      className="eye-emblem-svg"
+      viewBox="0 0 180 180"
+      role="img"
+      aria-label="All-seeing eye"
+    >
+      <g className="eye-rays" vectorEffect="non-scaling-stroke">
+        {Array.from({ length: 32 }).map((_, i) => {
+          const angle = (i * 360) / 32;
+          const isLong = i % 2 === 0;
+          return (
+            <line
+              key={i}
+              x1="90"
+              y1={isLong ? "16" : "24"}
+              x2="90"
+              y2={isLong ? "0" : "7"}
+              transform={`rotate(${angle} 90 90)`}
+            />
+          );
+        })}
+      </g>
+      <circle className="eye-halo" cx="90" cy="90" r="55" />
+      <path
+        className="eye-outline"
+        d="M29 90 C45 63, 69 50, 90 50 C111 50, 135 63, 151 90 C135 117, 111 130, 90 130 C69 130, 45 117, 29 90 Z"
+      />
+      <circle className="eye-iris" cx="90" cy="90" r="22" />
+      <circle className="eye-pupil" cx="90" cy="90" r="9" />
+      <circle className="eye-glint" cx="82" cy="82" r="4" />
+      <path className="eye-lid" d="M44 91 C62 75, 77 69, 90 69 C103 69, 118 75, 136 91" />
+      <path className="eye-lid lower" d="M47 91 C64 108, 78 114, 90 114 C102 114, 116 108, 133 91" />
+    </svg>
+  );
+}
+
 function Nav({ mode, onFilms, onPanel }) {
   const links = ["FILMS", "ABOUT", "MANIFESTO", "NEWS", "SHOP", "CONTACT"];
 
@@ -23,7 +207,7 @@ function Nav({ mode, onFilms, onPanel }) {
         ))}
 
         <button className="nav-emblem" onClick={onFilms} aria-label="Return to films">
-          <img src={siteConfig.logo} alt="" />
+          <EyeEmblem />
         </button>
 
         {links.slice(3).map((link) => (
@@ -300,34 +484,72 @@ function PanelOverlay({ panel, onClose }) {
   const copy = {
     about: "A living style sheet for the films, choices, attitude and taste of Holy Flock Films.",
     manifesto: "For the devoted and the deranged. Films built as belief systems, artefacts and fever dreams.",
+    music: "Sounds, scores, mixtapes and devotional noise from the Holy Flock universe.",
+    join: "A place for the faithful, the curious and the deranged. Sign-up details coming soon.",
+    pitch: "A curated slate of film worlds, pitch materials, posters and strange invitations.",
     news: "News, fragments, process notes and signals from the flock.",
     shop: "Objects, shirts, print artefacts and strange devotional merchandise.",
     contact: "For films, collaborations, screenings and strange invitations.",
   };
+
+  const titles = {
+    join: "JOIN THE FLOCK",
+    pitch: "PITCH SLATE",
+  };
+
+  const title = titles[panel] || panel.toUpperCase();
 
   return (
     <aside className="panel-overlay">
       <button onClick={onClose} className="panel-close">
         CLOSE ×
       </button>
-      <p className="eyebrow">{panel}</p>
-      <h1>{panel.toUpperCase()}</h1>
+      <p className="eyebrow">HOLY FLOCK</p>
+      <h1>{title}</h1>
       <p>{copy[panel] || "Coming soon."}</p>
     </aside>
   );
 }
 
 export default function App() {
+  const [introStage, setIntroStage] = useState("landing-one");
   const [selectedFilmId, setSelectedFilmId] = useState(null);
   const [panel, setPanel] = useState(null);
 
   const selectedFilm = films.find((film) => film.id === selectedFilmId);
   const mode = selectedFilm ? "dark" : "light";
 
+  const enterFilmSite = () => {
+    setPanel(null);
+    setSelectedFilmId(null);
+    setIntroStage("site");
+  };
+
   const goFilms = () => {
     setPanel(null);
     setSelectedFilmId(null);
+    setIntroStage("site");
   };
+
+  if (introStage === "landing-one") {
+    return <LandingPageOne onEnter={() => setIntroStage("landing-map")} />;
+  }
+
+  if (introStage === "landing-map") {
+    return (
+      <div className="landing-shell">
+        <LandingPageTwo
+          onBack={() => {
+            setPanel(null);
+            setIntroStage("landing-one");
+          }}
+          onEnterFilms={enterFilmSite}
+          onPanel={setPanel}
+        />
+        <PanelOverlay panel={panel} onClose={() => setPanel(null)} />
+      </div>
+    );
+  }
 
   return (
     <div className={`app-shell ${mode}`}>
